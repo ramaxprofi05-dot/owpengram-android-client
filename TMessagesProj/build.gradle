@@ -109,6 +109,15 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 }
 
+def femboygramApiId = (project.findProperty('FEMBOYGRAM_API_ID') ?: System.getenv('FEMBOYGRAM_API_ID') ?: '0').toString()
+def femboygramApiHash = (project.findProperty('FEMBOYGRAM_API_HASH') ?: System.getenv('FEMBOYGRAM_API_HASH') ?: '').toString()
+if (!(femboygramApiId ==~ /[0-9]+/)) {
+    throw new GradleException("FEMBOYGRAM_API_ID must contain digits only")
+}
+if (femboygramApiHash && !(femboygramApiHash ==~ /[0-9a-fA-F]{32}/)) {
+    throw new GradleException("FEMBOYGRAM_API_HASH must be a 32-character hexadecimal API hash")
+}
+
 android {
     compileSdkVersion 36
     buildToolsVersion '36.0.0'
@@ -135,6 +144,8 @@ android {
     }
 
     defaultConfig {
+        buildConfigField "int", "FEMBOYGRAM_API_ID", femboygramApiId
+        buildConfigField "String", "FEMBOYGRAM_API_HASH", "\"${femboygramApiHash}\""
         minSdkVersion 23
         targetSdkVersion 36
 
