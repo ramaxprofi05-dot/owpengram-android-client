@@ -38,6 +38,30 @@ public class ExteraPluginManifestTest {
     }
 
     @Test
+    public void rejectsDuplicateJsonKeysIncludingEscapedAndNestedNames() {
+        String base = new String(manifest("dist/main.js", "[]"), StandardCharsets.UTF_8);
+        String duplicate = base.replace("\\"name\\":\\"Profile Tools\\"",
+                "\\"name\\":\\"Profile Tools\\",\\"name\\":\\"Overridden\\"");
+        assertThrows(IllegalArgumentException.class, () ->
+                PluginManifest.parse(duplicate.getBytes(StandardCharsets.UTF_8))
+        );
+
+        String escapedName = "\\" + "u006eame";
+        String escapedDuplicate = base.replace("\\"name\\":\\"Profile Tools\\"",
+                "\\"name\\":\\"Profile Tools\\",\\"" + escapedName + "\\":\\"Overridden\\"");
+        assertThrows(IllegalArgumentException.class, () ->
+                PluginManifest.parse(escapedDuplicate.getBytes(StandardCharsets.UTF_8))
+        );
+
+        String nestedDuplicate = base.replace("\\"permissions\\":[ ]", "\\"permissions\\":[ ]");
+        nestedDuplicate = nestedDuplicate.substring(0, nestedDuplicate.length() - 1)
+                + ",\\"metadata\\":{\\"x\\":1,\\"x\\":2}}";
+        assertThrows(IllegalArgumentException.class, () ->
+                PluginManifest.parse(nestedDuplicate.getBytes(StandardCharsets.UTF_8))
+        );
+    }
+
+    @Test
     public void rejectsUnknownFieldsAndCapabilities() {
         assertThrows(IllegalArgumentException.class, () ->
                 PluginManifest.parse(manifest("dist/main.js", "[\"ui:root-access\"]"))
