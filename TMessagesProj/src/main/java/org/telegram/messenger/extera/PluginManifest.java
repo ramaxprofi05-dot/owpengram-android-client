@@ -199,8 +199,13 @@ public final class PluginManifest {
     }
 
     private static boolean isBase64Ed25519Signature(String value) {
+        if (value == null || value.isEmpty()) return false;
         try {
-            return android.util.Base64.decode(value, android.util.Base64.DEFAULT).length == 64;
+            byte[] decoded = android.util.Base64.decode(value, android.util.Base64.NO_WRAP);
+            // Android's decoder is permissive. Re-encoding requires canonical
+            // standard Base64 and rejects whitespace and alternate encodings.
+            return decoded.length == 64
+                    && android.util.Base64.encodeToString(decoded, android.util.Base64.NO_WRAP).equals(value);
         } catch (IllegalArgumentException error) {
             return false;
         }
