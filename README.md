@@ -169,3 +169,8 @@ under **GNU GPL v2 or later** ([LICENSE](LICENSE)).
 ---
 
 ⭐ If OwpenGram is useful to you, a star on GitHub helps a lot.
+
+
+## FemboyGram fork: API credentials
+
+The FemboyGram fork deliberately does not reuse OwpenGram's Telegram API credentials, Google client IDs, SafetyNet key, store links, or release updater. Create an application at https://my.telegram.org/apps and configure the repository Actions secrets `FEMBOYGRAM_API_ID` and `FEMBOYGRAM_API_HASH`. The Android build compiles with an empty credential fallback for CI, but authentication is not expected to work until the FemboyGram credentials are supplied. Passkeys and store billing remain disabled until FemboyGram has its own verified app integrations.
