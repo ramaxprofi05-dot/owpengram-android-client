@@ -226,8 +226,10 @@ public class ServerSelectFragment extends BaseFragment {
             if (s.isOfficial) official.add(s); else custom.add(s);
         }
 
-        rows.add("official");
-        rows.addAll(official);
+        if (!official.isEmpty()) {
+            rows.add("official");
+            rows.addAll(official);
+        }
 
         if (!custom.isEmpty()) {
             rows.add("custom");
