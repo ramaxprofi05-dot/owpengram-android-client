@@ -120,7 +120,7 @@ public final class PluginManifest {
     }
 
     private static boolean safeEntrypoint(String path, PluginCapability.Target target) {
-        if (path == null || path.isEmpty() || path.startsWith("/") || path.indexOf('\\\\') >= 0
+        if (path == null || path.isEmpty() || path.startsWith("/") || path.indexOf('\\') >= 0
                 || path.indexOf(':') >= 0 || path.indexOf('\0') >= 0) {
             return false;
         }
