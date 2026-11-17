@@ -22,6 +22,8 @@ jobs:
     env:
       ANDROID_HOME: /usr/local/lib/android/sdk
       ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+      FEMBOYGRAM_API_ID: ${{ secrets.FEMBOYGRAM_API_ID }}
+      FEMBOYGRAM_API_HASH: ${{ secrets.FEMBOYGRAM_API_HASH }}
     steps:
       - name: Checkout with submodules
         uses: actions/checkout@v4
