@@ -84,10 +84,10 @@ public class ExteraPluginManifestTest {
     @Test
     public void rejectsDuplicateAndWrongTargetCapabilities() {
         assertThrows(IllegalArgumentException.class, () ->
-                PluginManifest.parse(manifest("dist/main.js", "[\\"ui:profile\\",\\"ui:profile\\"]"))
+                PluginManifest.parse(manifest("dist/main.js", "[\"ui:profile\",\"ui:profile\"]"))
         );
         String serverManifest = new String(manifest("dist/main.js", "[]"), StandardCharsets.UTF_8)
-                .replace("\\"target\\":\\"android\\"", "\\"target\\":\\"server\\"");
+                .replace("\"target\":\"android\"", "\"target\":\"server\"");
         assertThrows(IllegalArgumentException.class, () ->
                 PluginManifest.parse(serverManifest.getBytes(StandardCharsets.UTF_8))
         );
@@ -105,13 +105,13 @@ public class ExteraPluginManifestTest {
     @Test
     public void rejectsMalformedIntegrityMetadata() {
         String withBadHash = new String(manifest("dist/main.js", "[]"), StandardCharsets.UTF_8)
-                .replace("\\"permissions\\":[]", "\\"permissions\\":[],\\"sha256\\":\\"not-a-hash\\"");
+                .replace("\"permissions\":[]", "\"permissions\":[],\"sha256\":\"not-a-hash\"");
         assertThrows(IllegalArgumentException.class, () ->
                 PluginManifest.parse(withBadHash.getBytes(StandardCharsets.UTF_8))
         );
 
         String withBadSignature = new String(manifest("dist/main.js", "[]"), StandardCharsets.UTF_8)
-                .replace("\\"permissions\\":[]", "\\"permissions\\":[],\\"signature\\":\\"%%%\\"");
+                .replace("\"permissions\":[]", "\"permissions\":[],\"signature\":\"%%%\"");
         assertThrows(IllegalArgumentException.class, () ->
                 PluginManifest.parse(withBadSignature.getBytes(StandardCharsets.UTF_8))
         );
