@@ -131,7 +131,11 @@ public class OwpengramServers {
     public static List<OwpengramServer> listServers() {
         List<OwpengramServer> result = new ArrayList<>();
         result.add(telegramServer());
-        result.add(owpengramServer());
+        // Do not ship the upstream OwpenGram public endpoint in FemboyGram.
+        // The FemboyGram server is not provisioned yet; users may add a server
+        // they control through the normal custom-server flow. This prevents a
+        // fresh FemboyGram install from silently routing accounts to a third
+        // party's public infrastructure.
         result.addAll(loadCustomServers());
         return result;
     }
