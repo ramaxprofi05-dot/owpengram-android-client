@@ -41,7 +41,7 @@ public class OwpengramServers {
     public static final String ID_TELEGRAM  = "telegram";
 
     /** Public repository of the OwpenGram server, opened from the settings entry. */
-    public static final String SERVER_REPO_URL = "https://github.com/owpengram/owpengram-server";
+    public static final String SERVER_REPO_URL = "https://github.com/ramaxprofi05-dot/owpengram-server";
 
     // Fired whenever the stored custom-server list changes (add/update/remove,
     // from ANY code path -- including one triggered from outside the
