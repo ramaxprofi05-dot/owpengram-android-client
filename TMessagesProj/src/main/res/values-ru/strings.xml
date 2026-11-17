@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="BoostingStars">Звёзды FemboyGram</string>
+    <string name="BotBalanceStars">Звёзды FemboyGram</string>
     <string name="AppName">FemboyGram</string>
     <string name="AppNameBeta">FemboyGram Beta</string>
     <string name="LanguageName">Русский</string>
