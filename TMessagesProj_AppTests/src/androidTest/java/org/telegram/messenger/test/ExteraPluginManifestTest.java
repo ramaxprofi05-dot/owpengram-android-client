@@ -80,4 +80,41 @@ public class ExteraPluginManifestTest {
         assertFalse(review.requiresRenewedConsent());
         assertEquals(Collections.singleton("events:profile-public"), review.noLongerRequested());
     }
+
+    @Test
+    public void rejectsDuplicateAndWrongTargetCapabilities() {
+        assertThrows(IllegalArgumentException.class, () ->
+                PluginManifest.parse(manifest("dist/main.js", "[\\"ui:profile\\",\\"ui:profile\\"]"))
+        );
+        String serverManifest = new String(manifest("dist/main.js", "[]"), StandardCharsets.UTF_8)
+                .replace("\\"target\\":\\"android\\"", "\\"target\\":\\"server\\"");
+        assertThrows(IllegalArgumentException.class, () ->
+                PluginManifest.parse(serverManifest.getBytes(StandardCharsets.UTF_8))
+        );
+    }
+
+    @Test
+    public void rejectsMalformedUtf8AndOversizedManifest() {
+        assertThrows(IllegalArgumentException.class, () ->
+                PluginManifest.parse(new byte[] {(byte) 0xc3, (byte) 0x28})
+        );
+        byte[] oversized = new byte[PluginManifest.MAX_MANIFEST_BYTES + 1];
+        assertThrows(IllegalArgumentException.class, () -> PluginManifest.parse(oversized));
+    }
+
+    @Test
+    public void rejectsMalformedIntegrityMetadata() {
+        String withBadHash = new String(manifest("dist/main.js", "[]"), StandardCharsets.UTF_8)
+                .replace("\\"permissions\\":[]", "\\"permissions\\":[],\\"sha256\\":\\"not-a-hash\\"");
+        assertThrows(IllegalArgumentException.class, () ->
+                PluginManifest.parse(withBadHash.getBytes(StandardCharsets.UTF_8))
+        );
+
+        String withBadSignature = new String(manifest("dist/main.js", "[]"), StandardCharsets.UTF_8)
+                .replace("\\"permissions\\":[]", "\\"permissions\\":[],\\"signature\\":\\"%%%\\"");
+        assertThrows(IllegalArgumentException.class, () ->
+                PluginManifest.parse(withBadSignature.getBytes(StandardCharsets.UTF_8))
+        );
+    }
+
 }
