@@ -71,10 +71,8 @@ android {
         // direct-download builds can coexist as separate installs): this
         // fork only ever
         // wants ONE installed app per device, sharing the same
-        // applicationId as :TMessagesProj_App (same keystore too -- see
-        // signingConfigs above), so switching a device from the Play build
-        // to this unrestricted one is a plain in-place update, not a fresh
-        // side-by-side install that starts local chat data over from zero.
+        // applicationId as :TMessagesProj_App. Debug builds use the generated
+        // debug key; production releases will use a FemboyGram-owned key.
         debug {
             debuggable true
             jniDebuggable true
