@@ -193,7 +193,7 @@ public final class PluginManifest {
         if (count < min || count > max) return false;
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
-            if (c < 0x20 && c != '\\t') return false;
+            if (c < 0x20 && c != '\t') return false;
         }
         return true;
     }
