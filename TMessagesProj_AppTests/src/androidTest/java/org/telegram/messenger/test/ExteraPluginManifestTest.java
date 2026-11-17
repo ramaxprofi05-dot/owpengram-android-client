@@ -140,4 +140,56 @@ public class ExteraPluginManifestTest {
         );
     }
 
+
+    @Test
+    public void permissionReviewRejectsInvalidPreviouslyInstalledGrants() {
+        assertThrows(IllegalArgumentException.class, () ->
+                PluginPermissionReview.compare(
+                        PluginCapability.Target.ANDROID,
+                        Collections.singleton("server:message-metadata-hook"),
+                        Collections.singleton("ui:profile")
+                )
+        );
+    }
+
+    @Test
+    public void permissionReviewDoesNotTreatRemovedGrantsAsNewConsent() {
+        PluginPermissionReview review = PluginPermissionReview.compare(
+                PluginCapability.Target.ANDROID,
+                new HashSet<>(Arrays.asList("ui:profile", "ui:profile-banner")),
+                Collections.singleton("ui:profile")
+        );
+        assertFalse(review.requiresRenewedConsent());
+        assertEquals(Collections.singleton("ui:profile"), review.requested());
+        assertEquals(Collections.singleton("ui:profile-banner"), review.noLongerRequested());
+    }
+
+    @Test
+    public void permissionReviewReturnsImmutableDeterministicSets() {
+        PluginPermissionReview review = PluginPermissionReview.compare(
+                PluginCapability.Target.ANDROID,
+                Collections.<String>emptySet(),
+                new HashSet<>(Arrays.asList("ui:profile-banner", "ui:profile"))
+        );
+        assertEquals(Arrays.asList("ui:profile", "ui:profile-banner"),
+                Arrays.asList(review.requested().toArray(new String[0])));
+        assertThrows(UnsupportedOperationException.class, () ->
+                review.requested().add("network:https")
+        );
+        assertThrows(UnsupportedOperationException.class, () ->
+                review.newlyRequested().clear()
+        );
+    }
+
+    @Test
+    public void permissionReviewRejectsMissingTarget() {
+        assertThrows(IllegalArgumentException.class, () ->
+                PluginPermissionReview.compare(
+                        null,
+                        Collections.<String>emptySet(),
+                        Collections.singleton("ui:profile")
+                )
+        );
+    }
+
 }
