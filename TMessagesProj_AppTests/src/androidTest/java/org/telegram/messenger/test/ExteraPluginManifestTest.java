@@ -40,21 +40,21 @@ public class ExteraPluginManifestTest {
     @Test
     public void rejectsDuplicateJsonKeysIncludingEscapedAndNestedNames() {
         String base = new String(manifest("dist/main.js", "[]"), StandardCharsets.UTF_8);
-        String nameField = "\\"name\\":\\"Profile Tools\\"";
-        String duplicate = base.replace(nameField, nameField + ",\\"name\\":\\"Overridden\\"");
+        String nameField = "\"name\":\"Profile Tools\"";
+        String duplicate = base.replace(nameField, nameField + ",\"name\":\"Overridden\"");
         assertThrows(IllegalArgumentException.class, () ->
                 PluginManifest.parse(duplicate.getBytes(StandardCharsets.UTF_8))
         );
 
         String escapedName = "\\" + "u006eame";
         String escapedDuplicate = base.replace(nameField,
-                nameField + ",\\"" + escapedName + "\\":\\"Overridden\\"");
+                nameField + ",\"" + escapedName + "\":\"Overridden\"");
         assertThrows(IllegalArgumentException.class, () ->
                 PluginManifest.parse(escapedDuplicate.getBytes(StandardCharsets.UTF_8))
         );
 
         String nestedDuplicate = base.substring(0, base.length() - 1)
-                + ",\\"metadata\\":{\\"x\\":1,\\"x\\":2}}";
+                + ",\"metadata\":{\"x\":1,\"x\":2}}";
         assertThrows(IllegalArgumentException.class, () ->
                 PluginManifest.parse(nestedDuplicate.getBytes(StandardCharsets.UTF_8))
         );
