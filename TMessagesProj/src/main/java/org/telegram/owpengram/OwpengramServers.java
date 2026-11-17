@@ -130,12 +130,10 @@ public class OwpengramServers {
 
     public static List<OwpengramServer> listServers() {
         List<OwpengramServer> result = new ArrayList<>();
-        result.add(telegramServer());
-        // Do not ship the upstream OwpenGram public endpoint in FemboyGram.
-        // The FemboyGram server is not provisioned yet; users may add a server
-        // they control through the normal custom-server flow. This prevents a
-        // fresh FemboyGram install from silently routing accounts to a third
-        // party's public infrastructure.
+        // FemboyGram is a self-hosted network. Do not offer Telegram's public
+        // cloud or OwpenGram's public endpoint as sign-in destinations.
+        // Until the FemboyGram endpoint is provisioned, the user adds the
+        // FemboyGram server through the normal custom-server flow.
         result.addAll(loadCustomServers());
         return result;
     }
