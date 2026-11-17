@@ -49,13 +49,8 @@ android {
     }
 
     signingConfigs {
-        debug {
-            storeFile file("../TMessagesProj/config/release.keystore")
-            storePassword RELEASE_STORE_PASSWORD
-            keyAlias RELEASE_KEY_ALIAS
-            keyPassword RELEASE_KEY_PASSWORD
-        }
-
+        // Release signing is supplied only by the FemboyGram owner at release time.
+        // Debug builds use Android Gradle Plugin's generated ~/.android/debug.keystore.
         release {
             storeFile file("../TMessagesProj/config/release.keystore")
             storePassword RELEASE_STORE_PASSWORD
@@ -83,7 +78,6 @@ android {
         debug {
             debuggable true
             jniDebuggable true
-            signingConfig signingConfigs.debug
             minifyEnabled false
             multiDexEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), '../TMessagesProj/proguard-rules.pro'
