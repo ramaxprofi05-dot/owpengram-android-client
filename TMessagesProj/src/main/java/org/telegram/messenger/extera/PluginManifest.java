@@ -3,7 +3,11 @@ package org.telegram.messenger.extera;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashSet;
@@ -87,6 +91,7 @@ public final class PluginManifest {
         if (!java.util.Arrays.equals(data, jsonText.getBytes(StandardCharsets.UTF_8))) {
             throw new IllegalArgumentException("plugin manifest must be valid UTF-8");
         }
+        rejectDuplicateKeys(jsonText);
         JsonElement root = JsonParser.parseString(jsonText);
         if (!root.isJsonObject()) {
             throw new IllegalArgumentException("plugin manifest must be a JSON object");
@@ -98,6 +103,53 @@ public final class PluginManifest {
             }
         }
         return new PluginManifest(object);
+    }
+
+    private static void rejectDuplicateKeys(String jsonText) {
+        try (JsonReader reader = new JsonReader(new StringReader(jsonText))) {
+            reader.setLenient(false);
+            scanJsonValue(reader);
+            if (reader.peek() != JsonToken.END_DOCUMENT) {
+                throw new IllegalArgumentException("plugin manifest must contain exactly one JSON value");
+            }
+        } catch (IOException error) {
+            throw new IllegalArgumentException("plugin manifest JSON is malformed", error);
+        }
+    }
+
+    private static void scanJsonValue(JsonReader reader) throws IOException {
+        JsonToken token = reader.peek();
+        switch (token) {
+            case BEGIN_OBJECT:
+                reader.beginObject();
+                Set<String> names = new HashSet<>();
+                while (reader.hasNext()) {
+                    String name = reader.nextName();
+                    if (!names.add(name)) {
+                        throw new IllegalArgumentException("duplicate plugin manifest key: " + name);
+                    }
+                    scanJsonValue(reader);
+                }
+                reader.endObject();
+                return;
+            case BEGIN_ARRAY:
+                reader.beginArray();
+                while (reader.hasNext()) scanJsonValue(reader);
+                reader.endArray();
+                return;
+            case STRING:
+            case NUMBER:
+                reader.nextString();
+                return;
+            case BOOLEAN:
+                reader.nextBoolean();
+                return;
+            case NULL:
+                reader.nextNull();
+                return;
+            default:
+                throw new IllegalArgumentException("unexpected token in plugin manifest: " + token);
+        }
     }
 
     public boolean isInstallable() {
