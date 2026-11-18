@@ -17,7 +17,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -177,7 +176,7 @@ public final class PluginRegistry {
         json.addProperty("version", manifest.version);
         json.addProperty("author", manifest.author);
         json.addProperty("description", manifest.description);
-        json.addProperty("target", manifest.target.manifestValue());
+        json.addProperty("target", manifest.target == PluginCapability.Target.ANDROID ? "android" : "server");
         json.addProperty("entrypoint", manifest.entrypoint);
         JsonArray permissions = new JsonArray();
         for (String permission : new TreeSet<>(manifest.permissions)) permissions.add(permission);
