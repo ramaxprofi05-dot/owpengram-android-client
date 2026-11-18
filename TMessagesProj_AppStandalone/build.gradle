@@ -28,7 +28,11 @@ android {
     buildToolsVersion '36.0.0'
 
     defaultConfig.applicationId = APP_PACKAGE
-    defaultConfig.manifestPlaceholders = [appLabel: APP_PACKAGE == 'com.exteragram.messenger' ? 'ExteraGram' : 'FemboyGram']
+    defaultConfig.manifestPlaceholders = [
+        appLabel: APP_PACKAGE == 'com.exteragram.messenger' ? 'ExteraGram' : 'FemboyGram',
+        appIcon: APP_PACKAGE == 'com.exteragram.messenger' ? '@mipmap/ic_launcher_extera' : '@mipmap/ic_launcher',
+        appRoundIcon: APP_PACKAGE == 'com.exteragram.messenger' ? '@mipmap/ic_launcher_extera' : '@mipmap/ic_launcher_round'
+    ]
 
 
     lintOptions {
