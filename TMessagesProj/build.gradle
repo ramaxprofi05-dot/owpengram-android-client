@@ -109,6 +109,8 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 }
 
+def femboygramAppPackage = (project.findProperty('APP_PACKAGE') ?: 'com.femboygram.messenger').toString()
+def femboygramAppEdition = femboygramAppPackage == 'com.exteragram.messenger' ? 'extera' : 'femboy'
 def femboygramApiId = (project.findProperty('FEMBOYGRAM_API_ID') ?: System.getenv('FEMBOYGRAM_API_ID') ?: '0').toString()
 def femboygramApiHash = (project.findProperty('FEMBOYGRAM_API_HASH') ?: System.getenv('FEMBOYGRAM_API_HASH') ?: '').toString()
 if (!(femboygramApiId ==~ /[0-9]+/)) {
@@ -146,6 +148,7 @@ android {
     defaultConfig {
         buildConfigField "int", "FEMBOYGRAM_API_ID", femboygramApiId
         buildConfigField "String", "FEMBOYGRAM_API_HASH", "\"${femboygramApiHash}\""
+        buildConfigField "String", "APP_EDITION", "\"${femboygramAppEdition}\""
         minSdkVersion 23
         targetSdkVersion 36
 
