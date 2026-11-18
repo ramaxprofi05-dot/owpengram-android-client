@@ -13077,8 +13077,16 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             if (temporary.exists() && !temporary.delete()) {
                 throw new IllegalStateException("Could not clear temporary profile banner");
             }
-            if (backup.exists() && !backup.delete()) {
-                throw new IllegalStateException("Could not clear previous profile banner backup");
+            // Recover a previous banner if the process was interrupted between
+            // moving the destination aside and installing the replacement.
+            if (backup.exists()) {
+                if (!destination.exists()) {
+                    if (!backup.renameTo(destination)) {
+                        throw new IllegalStateException("Could not restore interrupted profile banner replacement");
+                    }
+                } else if (!backup.delete()) {
+                    throw new IllegalStateException("Could not clear previous profile banner backup");
+                }
             }
 
             long copied = 0;
