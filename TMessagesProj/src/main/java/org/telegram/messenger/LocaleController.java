@@ -1468,7 +1468,9 @@ public class LocaleController {
         if (value == null) {
             return "LOC_ERR:" + key;
         }
-        return value;
+        // The two editions share the Telegram-derived localization catalogue,
+        // but must never expose the other edition's brand in user-facing text.
+        return BuildVars.isExteraGram() ? value.replace("FemboyGram", "ExteraGram") : value;
     }
 
     public static String getServerString(String key) {
