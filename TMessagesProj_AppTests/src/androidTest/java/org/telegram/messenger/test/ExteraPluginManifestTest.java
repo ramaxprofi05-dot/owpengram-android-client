@@ -5,6 +5,12 @@ import org.telegram.messenger.extera.PluginCapability;
 import org.telegram.messenger.extera.PluginManifest;
 import org.telegram.messenger.extera.PluginInstallation;
 import org.telegram.messenger.extera.PluginPermissionReview;
+import org.telegram.messenger.extera.PluginRegistry;
+
+import android.content.Context;
+import androidx.test.platform.app.InstrumentationRegistry;
+
+import java.io.File;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -347,6 +353,37 @@ public class ExteraPluginManifestTest {
         assertEquals(PluginInstallation.State.UNINSTALLED, removed.state);
         assertTrue(removed.grantedPermissions().isEmpty());
         assertThrows(IllegalStateException.class, removed::enable);
+    }
+
+
+    @Test
+    public void registryPersistsStateAndRequiresPackageReverificationAfterRestore() {
+        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        File registryDirectory = new File(context.getNoBackupFilesDir(), "extera");
+        File registryFile = new File(registryDirectory, "plugins.json");
+        File backupFile = new File(registryDirectory, "plugins.json.bak");
+        registryFile.delete();
+        backupFile.delete();
+
+        try {
+            PluginInstallation installation = PluginInstallation.install(
+                    installableManifest("1.0.0", "[\\"ui:profile\\"]"),
+                    Collections.singleton("ui:profile"), true
+            ).disable();
+            PluginRegistry registry = new PluginRegistry(context);
+            registry.save(Collections.singleton(installation));
+
+            PluginInstallation restored = registry.load().get("dev.example.profile-tools");
+            assertNotNull(restored);
+            assertEquals(PluginInstallation.State.DISABLED, restored.state);
+            assertEquals(Collections.singleton("ui:profile"), restored.grantedPermissions());
+            assertFalse(restored.isPackageVerified());
+            assertThrows(SecurityException.class, () -> restored.afterPackageVerification(false));
+            assertTrue(restored.afterPackageVerification(true).isPackageVerified());
+        } finally {
+            registryFile.delete();
+            backupFile.delete();
+        }
     }
 
 }
