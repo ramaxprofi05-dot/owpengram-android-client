@@ -68,6 +68,9 @@ jobs:
           MERGED_MANIFEST="$(find TMessagesProj_AppStandalone/build/intermediates/merged_manifest -type f -name AndroidManifest.xml -print -quit)"
           test -n "$MERGED_MANIFEST"
           grep -F 'android:label="FemboyGram"' "$MERGED_MANIFEST"
+          BUILD_CONFIG="$(find TMessagesProj/build/generated/source/buildConfig -type f -name BuildConfig.java -print -quit)"
+          test -n "$BUILD_CONFIG"
+          grep -F 'APP_EDITION = "femboy"' "$BUILD_CONFIG"
 
       - name: Compile ExteraGram application identity
         run: |
@@ -79,6 +82,9 @@ jobs:
           MERGED_MANIFEST="$(find TMessagesProj_AppStandalone/build/intermediates/merged_manifest -type f -name AndroidManifest.xml -print -quit)"
           test -n "$MERGED_MANIFEST"
           grep -F 'android:label="ExteraGram"' "$MERGED_MANIFEST"
+          BUILD_CONFIG="$(find TMessagesProj/build/generated/source/buildConfig -type f -name BuildConfig.java -print -quit)"
+          test -n "$BUILD_CONFIG"
+          grep -F 'APP_EDITION = "extera"' "$BUILD_CONFIG"
 
   build:
     needs: verify
@@ -101,6 +107,12 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+
+      - name: Validate FemboyGram API credentials
+        shell: bash
+        run: |
+          [[ "$FEMBOYGRAM_API_ID" =~ ^[1-9][0-9]*$ ]]
+          [[ "$FEMBOYGRAM_API_HASH" =~ ^[a-fA-F0-9]{32}$ ]]
 
       - name: Install Android build tools
         run: |
