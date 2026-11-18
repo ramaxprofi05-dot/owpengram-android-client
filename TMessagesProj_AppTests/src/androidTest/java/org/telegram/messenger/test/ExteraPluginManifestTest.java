@@ -189,6 +189,24 @@ public class ExteraPluginManifestTest {
     }
 
     @Test
+    public void permissionReviewRejectsNullCapabilityAsInvalidInput() {
+        assertThrows(IllegalArgumentException.class, () ->
+                PluginPermissionReview.compare(
+                        PluginCapability.Target.ANDROID,
+                        Collections.<String>emptySet(),
+                        Collections.singleton(null)
+                )
+        );
+        assertThrows(IllegalArgumentException.class, () ->
+                PluginPermissionReview.compare(
+                        PluginCapability.Target.ANDROID,
+                        Collections.singleton(null),
+                        Collections.<String>emptySet()
+                )
+        );
+    }
+
+    @Test
     public void permissionReviewRejectsMissingTarget() {
         assertThrows(IllegalArgumentException.class, () ->
                 PluginPermissionReview.compare(
