@@ -1,5 +1,6 @@
 package org.telegram.messenger.extera;
 
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -74,8 +75,8 @@ public final class PluginInstallation {
                 || manifest.target != updatedManifest.target) {
             throw new IllegalArgumentException("Plugin identity and target cannot change during update");
         }
-        if (manifest.version.equals(updatedManifest.version)) {
-            throw new IllegalArgumentException("Update must use a different plugin version");
+        if (compareVersions(updatedManifest.version, manifest.version) <= 0) {
+            throw new IllegalArgumentException("Plugin update must have a strictly newer version");
         }
 
         PluginPermissionReview review = PluginPermissionReview.compare(
@@ -102,6 +103,42 @@ public final class PluginInstallation {
 
     public Set<String> grantedPermissions() {
         return grantedPermissions;
+    }
+
+
+    private static int compareVersions(String left, String right) {
+        String[] leftParts = left.split("\\+", 2)[0].split("-", 2);
+        String[] rightParts = right.split("\\+", 2)[0].split("-", 2);
+        String[] leftCore = leftParts[0].split("\\.");
+        String[] rightCore = rightParts[0].split("\\.");
+        for (int i = 0; i < 3; i++) {
+            int compared = new BigInteger(leftCore[i]).compareTo(new BigInteger(rightCore[i]));
+            if (compared != 0) return compared;
+        }
+
+        boolean leftPrerelease = leftParts.length > 1;
+        boolean rightPrerelease = rightParts.length > 1;
+        if (!leftPrerelease && !rightPrerelease) return 0;
+        if (!leftPrerelease) return 1;
+        if (!rightPrerelease) return -1;
+
+        String[] leftIds = leftParts[1].split("\\.");
+        String[] rightIds = rightParts[1].split("\\.");
+        int count = Math.min(leftIds.length, rightIds.length);
+        for (int i = 0; i < count; i++) {
+            boolean leftNumeric = leftIds[i].matches("[0-9]+");
+            boolean rightNumeric = rightIds[i].matches("[0-9]+");
+            int compared;
+            if (leftNumeric && rightNumeric) {
+                compared = new BigInteger(leftIds[i]).compareTo(new BigInteger(rightIds[i]));
+            } else if (leftNumeric != rightNumeric) {
+                compared = leftNumeric ? -1 : 1;
+            } else {
+                compared = leftIds[i].compareTo(rightIds[i]);
+            }
+            if (compared != 0) return compared;
+        }
+        return Integer.compare(leftIds.length, rightIds.length);
     }
 
     private void requireInstalled() {
