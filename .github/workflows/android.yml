@@ -98,7 +98,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: femboygram-android-debug
-          path: TMessagesProj_AppStandalone/build/outputs/apk/femboygram/afat/debug/app.apk
+          path: TMessagesProj_AppStandalone/build/outputs/apk/femboygramAfat/debug/app.apk
           if-no-files-found: error
           retention-days: 14
 
@@ -106,6 +106,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: exteragram-android-debug
-          path: TMessagesProj_AppStandalone/build/outputs/apk/exteragram/afat/debug/app.apk
+          path: TMessagesProj_AppStandalone/build/outputs/apk/exteragramAfat/debug/app.apk
           if-no-files-found: error
           retention-days: 14
