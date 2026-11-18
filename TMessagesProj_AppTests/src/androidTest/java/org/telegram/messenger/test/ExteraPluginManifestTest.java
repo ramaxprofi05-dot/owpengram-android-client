@@ -245,6 +245,30 @@ public class ExteraPluginManifestTest {
         assertEquals(validSignature, parsed.signature);
     }
 
+
+    @Test
+    public void enforcesSemanticVersionPrereleaseAndBuildIdentifierRules() {
+        assertThrows(IllegalArgumentException.class, () ->
+                PluginManifest.parse(manifestWithVersion("1.0.0-01"))
+        );
+        assertThrows(IllegalArgumentException.class, () ->
+                PluginManifest.parse(manifestWithVersion("1.0.0-alpha..1"))
+        );
+        assertThrows(IllegalArgumentException.class, () ->
+                PluginManifest.parse(manifestWithVersion("1.0.0+build..x"))
+        );
+        PluginManifest valid = PluginManifest.parse(
+                manifestWithVersion("1.0.0-alpha.1+build.007")
+        );
+        assertEquals("1.0.0-alpha.1+build.007", valid.version);
+    }
+
+    private static byte[] manifestWithVersion(String version) {
+        String json = new String(manifest("dist/main.js", "[]"), StandardCharsets.UTF_8)
+                .replace("\"version\":\"1.0.0\"", "\"version\":\"" + version + "\"");
+        return json.getBytes(StandardCharsets.UTF_8);
+    }
+
     @Test
     public void rejectsExcessivelyNestedManifestJson() {
         String nested = "[".repeat(40) + "0" + "]".repeat(40);
