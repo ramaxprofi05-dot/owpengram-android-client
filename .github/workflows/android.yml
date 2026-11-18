@@ -65,6 +65,9 @@ jobs:
             :TMessagesProj_AppStandalone:compileAfatDebugJavaWithJavac \
             :TMessagesProj_AppTests:compileAfatDebugAndroidTestJavaWithJavac \
             :TMessagesProj_AppTests:compileAfatDebugAndroidTestKotlin
+          MERGED_MANIFEST="$(find TMessagesProj_AppStandalone/build/intermediates/merged_manifest -type f -name AndroidManifest.xml -print -quit)"
+          test -n "$MERGED_MANIFEST"
+          grep -F 'android:label="FemboyGram"' "$MERGED_MANIFEST"
 
       - name: Compile ExteraGram application identity
         run: |
@@ -73,6 +76,9 @@ jobs:
             :TMessagesProj_AppStandalone:compileAfatDebugJavaWithJavac \
             :TMessagesProj_AppTests:compileAfatDebugAndroidTestJavaWithJavac \
             :TMessagesProj_AppTests:compileAfatDebugAndroidTestKotlin
+          MERGED_MANIFEST="$(find TMessagesProj_AppStandalone/build/intermediates/merged_manifest -type f -name AndroidManifest.xml -print -quit)"
+          test -n "$MERGED_MANIFEST"
+          grep -F 'android:label="ExteraGram"' "$MERGED_MANIFEST"
 
   build:
     needs: verify
