@@ -99,10 +99,24 @@ jobs:
             :TMessagesProj_AppStandalone:assembleExteragramAfatDebug
 
       - name: Stage clearly named APKs
+        shell: bash
         run: |
+          set -euo pipefail
           mkdir -p dist
-          cp TMessagesProj_AppStandalone/build/outputs/apk/femboygram/afat/debug/app.apk dist/FemboyGram-debug.apk
-          cp TMessagesProj_AppStandalone/build/outputs/apk/exteragram/afat/debug/app.apk dist/ExteraGram-debug.apk
+          found_femboygram=false
+          found_exteragram=false
+          while IFS= read -r -d '' apk; do
+            package_info="$("$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$apk")"
+            if grep -q "package: name='com.femboygram.messenger'" <<< "$package_info"; then
+              cp "$apk" dist/FemboyGram-debug.apk
+              found_femboygram=true
+            elif grep -q "package: name='com.exteragram.messenger'" <<< "$package_info"; then
+              cp "$apk" dist/ExteraGram-debug.apk
+              found_exteragram=true
+            fi
+          done < <(find TMessagesProj_AppStandalone/build/outputs/apk -type f -name '*.apk' -print0)
+          test "$found_femboygram" = true
+          test "$found_exteragram" = true
           test -s dist/FemboyGram-debug.apk
           test -s dist/ExteraGram-debug.apk
 
