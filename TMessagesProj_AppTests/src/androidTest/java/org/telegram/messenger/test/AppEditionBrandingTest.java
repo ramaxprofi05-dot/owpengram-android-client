@@ -22,5 +22,6 @@ public class AppEditionBrandingTest {
         assertEquals(expectedEdition, BuildVars.APP_EDITION);
         assertEquals(extera, BuildVars.isExteraGram());
         assertTrue(LocaleController.getString(R.string.AppName).contains(expectedBrand));
+        assertEquals("https://t.me/FemboyGramTips", LocaleController.getString(R.string.TelegramFeaturesUrl));
     }
 }
