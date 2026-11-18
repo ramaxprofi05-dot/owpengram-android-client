@@ -5378,8 +5378,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             if (bannerPath != null) {
                 profileBannerView.setImageFile(new File(bannerPath));
             }
-            avatarContainer2.addView(profileBannerView, 0, LayoutHelper.createFrame(
-                    LayoutHelper.MATCH_PARENT, getHeaderOnlyExtraHeight(), Gravity.TOP | Gravity.LEFT
+            avatarContainer2.addView(profileBannerView, 0, new FrameLayout.LayoutParams(
+                    LayoutParams.MATCH_PARENT, getHeaderOnlyExtraHeight(), Gravity.TOP | Gravity.LEFT
             ));
         }
         avatarContainer.setPivotX(0);
