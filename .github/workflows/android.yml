@@ -57,15 +57,14 @@ jobs:
 
       # Compile both actual application variants. APK packaging remains disabled
       # until the explicit release gate is opened.
-      - name: Compile FemboyGram and ExteraGram application sources
+      - name: Compile shared application sources and instrumentation tests
         run: |
-          ./gradlew --no-daemon --stacktrace \
-            :TMessagesProj_AppStandalone:compileFemboygramAfatDebugJavaWithJavac \
-            :TMessagesProj_AppStandalone:compileExteragramAfatDebugJavaWithJavac
-
-      - name: Compile Extera instrumentation tests
-        run: |
-          ./gradlew --no-daemon --stacktrace \
+          # APP_PACKAGE is a Gradle project property, not a product flavor.
+          # Both editions compile the same source tree; package identity is
+          # verified separately when each edition is assembled behind the
+          # explicit release gate below.
+          ./gradlew --no-daemon --stacktrace -PAPP_PACKAGE=com.femboygram.messenger \
+            :TMessagesProj_AppStandalone:compileAfatDebugJavaWithJavac \
             :TMessagesProj_AppTests:compileAfatDebugAndroidTestJavaWithJavac \
             :TMessagesProj_AppTests:compileAfatDebugAndroidTestKotlin
 
@@ -97,33 +96,33 @@ jobs:
           yes | "$SDKMANAGER" --licenses
           "$SDKMANAGER" --install "platforms;android-36" "build-tools;36.0.0" "ndk;27.2.12479018" "cmake;3.22.1"
 
-      - name: Assemble both editions
+      - name: Assemble and verify FemboyGram APK
         run: |
-          ./gradlew --no-daemon --stacktrace \
-            :TMessagesProj_AppStandalone:assembleFemboygramAfatDebug \
-            :TMessagesProj_AppStandalone:assembleExteragramAfatDebug
-
-      - name: Stage clearly named APKs
-        shell: bash
-        run: |
-          set -euo pipefail
+          ./gradlew --no-daemon --stacktrace -PAPP_PACKAGE=com.femboygram.messenger \
+            :TMessagesProj_AppStandalone:assembleAfatDebug
           mkdir -p dist
-          found_femboygram=false
-          found_exteragram=false
-          while IFS= read -r -d '' apk; do
-            package_info="$("$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$apk")"
-            if grep -q "package: name='com.femboygram.messenger'" <<< "$package_info"; then
-              cp "$apk" dist/FemboyGram-debug.apk
-              found_femboygram=true
-            elif grep -q "package: name='com.exteragram.messenger'" <<< "$package_info"; then
-              cp "$apk" dist/ExteraGram-debug.apk
-              found_exteragram=true
-            fi
-          done < <(find TMessagesProj_AppStandalone/build/outputs/apk -type f -name '*.apk' -print0)
-          test "$found_femboygram" = true
-          test "$found_exteragram" = true
+          APK="TMessagesProj_AppStandalone/build/outputs/apk/afat/debug/app.apk"
+          test -s "$APK"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | \
+            grep -F "package: name='com.femboygram.messenger'"
+          cp "$APK" dist/FemboyGram-debug.apk
+
+      - name: Assemble and verify ExteraGram APK
+        run: |
+          ./gradlew --no-daemon --stacktrace -PAPP_PACKAGE=com.exteragram.messenger \
+            :TMessagesProj_AppStandalone:assembleAfatDebug
+          APK="TMessagesProj_AppStandalone/build/outputs/apk/afat/debug/app.apk"
+          test -s "$APK"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | \
+            grep -F "package: name='com.exteragram.messenger'"
+          cp "$APK" dist/ExteraGram-debug.apk
+
+      - name: Verify staged APK artifacts
+        run: |
           test -s dist/FemboyGram-debug.apk
           test -s dist/ExteraGram-debug.apk
+          test "$(sha256sum dist/FemboyGram-debug.apk | cut -d' ' -f1)" != \
+               "$(sha256sum dist/ExteraGram-debug.apk | cut -d' ' -f1)"
 
       - name: Upload both APKs
         uses: actions/upload-artifact@v4
