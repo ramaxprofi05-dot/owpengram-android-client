@@ -1,8 +1,13 @@
-name: FemboyGram + ExteraGram Android
+name: FemboyGram Android
 
 on:
   push:
-    branches: [femboygram, feature/profile-banners]
+    branches: [femboygram]
+    paths:
+      - '**'
+      - '.github/workflows/android.yml'
+  pull_request:
+    branches: [femboygram]
     paths:
       - '**'
       - '.github/workflows/android.yml'
@@ -18,12 +23,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: dual-edition-android-${{ github.ref }}
+  group: femboygram-android-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  verify-both-editions:
-    if: ${{ github.event_name == 'push' }}
+  verify:
+    if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     env:
@@ -50,13 +55,17 @@ jobs:
           yes | "$SDKMANAGER" --licenses
           "$SDKMANAGER" --install "platforms;android-36" "build-tools;36.0.0" "ndk;27.2.12479018" "cmake;3.22.1"
 
-      # Compile both app variants and the existing instrumentation-test sources.
-      # This does not assemble, package, sign, or upload an APK.
-      - name: Compile FemboyGram and ExteraGram Java sources
+      # Compile both actual application variants. APK packaging remains disabled
+      # until the explicit release gate is opened.
+      - name: Compile FemboyGram and ExteraGram application sources
         run: |
           ./gradlew --no-daemon --stacktrace \
             :TMessagesProj_AppStandalone:compileFemboygramAfatDebugJavaWithJavac \
-            :TMessagesProj_AppStandalone:compileExteragramAfatDebugJavaWithJavac \
+            :TMessagesProj_AppStandalone:compileExteragramAfatDebugJavaWithJavac
+
+      - name: Compile Extera instrumentation tests
+        run: |
+          ./gradlew --no-daemon --stacktrace \
             :TMessagesProj_AppTests:compileAfatDebugAndroidTestJavaWithJavac \
             :TMessagesProj_AppTests:compileAfatDebugAndroidTestKotlin
 
@@ -88,24 +97,38 @@ jobs:
           yes | "$SDKMANAGER" --licenses
           "$SDKMANAGER" --install "platforms;android-36" "build-tools;36.0.0" "ndk;27.2.12479018" "cmake;3.22.1"
 
-      - name: Build FemboyGram debug APK
-        run: ./gradlew --no-daemon --stacktrace :TMessagesProj_AppStandalone:assembleFemboygramAfatDebug
+      - name: Assemble both editions
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            :TMessagesProj_AppStandalone:assembleFemboygramAfatDebug \
+            :TMessagesProj_AppStandalone:assembleExteragramAfatDebug
 
-      - name: Build ExteraGram debug APK
-        run: ./gradlew --no-daemon --stacktrace :TMessagesProj_AppStandalone:assembleExteragramAfatDebug
+      - name: Stage clearly named APKs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          found_femboygram=false
+          found_exteragram=false
+          while IFS= read -r -d '' apk; do
+            package_info="$("$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$apk")"
+            if grep -q "package: name='com.femboygram.messenger'" <<< "$package_info"; then
+              cp "$apk" dist/FemboyGram-debug.apk
+              found_femboygram=true
+            elif grep -q "package: name='com.exteragram.messenger'" <<< "$package_info"; then
+              cp "$apk" dist/ExteraGram-debug.apk
+              found_exteragram=true
+            fi
+          done < <(find TMessagesProj_AppStandalone/build/outputs/apk -type f -name '*.apk' -print0)
+          test "$found_femboygram" = true
+          test "$found_exteragram" = true
+          test -s dist/FemboyGram-debug.apk
+          test -s dist/ExteraGram-debug.apk
 
-      - name: Upload FemboyGram debug APK
+      - name: Upload both APKs
         uses: actions/upload-artifact@v4
         with:
-          name: femboygram-android-debug
-          path: TMessagesProj_AppStandalone/build/outputs/apk/femboygramAfat/debug/app.apk
-          if-no-files-found: error
-          retention-days: 14
-
-      - name: Upload ExteraGram debug APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: exteragram-android-debug
-          path: TMessagesProj_AppStandalone/build/outputs/apk/exteragramAfat/debug/app.apk
+          name: femboygram-and-exteragram-debug
+          path: dist/*.apk
           if-no-files-found: error
           retention-days: 14
