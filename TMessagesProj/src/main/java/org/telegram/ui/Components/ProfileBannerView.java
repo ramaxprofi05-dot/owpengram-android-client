@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.BuildConfig;
 import org.telegram.messenger.R;
 
 import java.io.File;
@@ -32,9 +33,13 @@ public class ProfileBannerView extends FrameLayout {
 
     public ProfileBannerView(Context context) {
         super(context);
+        boolean exteraEdition = BuildConfig.FLAVOR != null && BuildConfig.FLAVOR.startsWith("exteragram");
+        int[] bannerColors = exteraEdition
+                ? new int[]{0xFF202A46, 0xFF4B5F8A, 0xFF9A8AC7}
+                : new int[]{0xFF372D55, 0xFF815274, 0xFFE98BAE};
         setBackground(new GradientDrawable(
                 GradientDrawable.Orientation.TL_BR,
-                new int[]{0xFF372D55, 0xFF815274, 0xFFE98BAE}
+                bannerColors
         ));
         setClipChildren(true);
         setClipToPadding(true);
