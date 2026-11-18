@@ -231,5 +231,22 @@ public class ExteraPluginManifestTest {
         assertEquals(validSignature, parsed.signature);
     }
 
+    @Test
+    public void rejectsExcessivelyNestedManifestJson() {
+        String nested = "[".repeat(40) + "0" + "]".repeat(40);
+        String json = "{\\"id\\":\\"dev.example.profile-tools\\","
+                + "\\"name\\":\\"Profile Tools\\","
+                + "\\"version\\":\\"1.0.0\\","
+                + "\\"author\\":\\"Example Publisher\\","
+                + "\\"description\\":\\"Profile presentation helpers\\","
+                + "\\"target\\":\\"android\\","
+                + "\\"entrypoint\\":\\"dist/main.js\\","
+                + "\\"permissions\\":[],"
+                + "\\"metadata\\":" + nested + "}";
+        assertThrows(IllegalArgumentException.class, () ->
+                PluginManifest.parse(json.getBytes(StandardCharsets.UTF_8))
+        );
+    }
+
 
 }
