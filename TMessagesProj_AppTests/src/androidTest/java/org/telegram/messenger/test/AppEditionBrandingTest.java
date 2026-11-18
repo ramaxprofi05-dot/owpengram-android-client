@@ -15,7 +15,7 @@ public class AppEditionBrandingTest {
     @Test
     public void applicationIdSelectsConsistentEditionBrand() {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        boolean extera = "com.exteragram.messenger".equals(context.getPackageName());
+        boolean extera = context.getPackageName().startsWith("com.exteragram.messenger");
         String expectedEdition = extera ? "extera" : "femboy";
         String expectedBrand = extera ? "ExteraGram" : "FemboyGram";
 
