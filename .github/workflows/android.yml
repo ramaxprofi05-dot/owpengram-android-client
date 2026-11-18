@@ -1,8 +1,8 @@
-name: FemboyGram Android
+name: FemboyGram + ExteraGram Android
 
 on:
   push:
-    branches: [femboygram]
+    branches: [femboygram, feature/profile-banners]
     paths:
       - '**'
       - '.github/workflows/android.yml'
@@ -18,11 +18,11 @@ permissions:
   contents: read
 
 concurrency:
-  group: femboygram-android-${{ github.ref }}
+  group: dual-edition-android-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  verify-plugin-tests:
+  verify-both-editions:
     if: ${{ github.event_name == 'push' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 90
@@ -50,10 +50,15 @@ jobs:
           yes | "$SDKMANAGER" --licenses
           "$SDKMANAGER" --install "platforms;android-36" "build-tools;36.0.0" "ndk;27.2.12479018" "cmake;3.22.1"
 
-      # Compile the instrumentation-test sources only. This does not assemble,
-      # package, sign, or upload an APK; device execution remains a later gate.
-      - name: Compile Extera instrumentation tests without assembling APK
-        run: ./gradlew --no-daemon --stacktrace :TMessagesProj_AppTests:compileAfatDebugAndroidTestJavaWithJavac :TMessagesProj_AppTests:compileAfatDebugAndroidTestKotlin
+      # Compile both app variants and the existing instrumentation-test sources.
+      # This does not assemble, package, sign, or upload an APK.
+      - name: Compile FemboyGram and ExteraGram Java sources
+        run: |
+          ./gradlew --no-daemon --stacktrace \
+            :TMessagesProj_AppStandalone:compileFemboygramAfatDebugJavaWithJavac \
+            :TMessagesProj_AppStandalone:compileExteragramAfatDebugJavaWithJavac \
+            :TMessagesProj_AppTests:compileAfatDebugAndroidTestJavaWithJavac \
+            :TMessagesProj_AppTests:compileAfatDebugAndroidTestKotlin
 
   build:
     if: ${{ (github.event_name == 'workflow_dispatch' && inputs.build_apk) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[build-apk]')) }}
@@ -84,12 +89,23 @@ jobs:
           "$SDKMANAGER" --install "platforms;android-36" "build-tools;36.0.0" "ndk;27.2.12479018" "cmake;3.22.1"
 
       - name: Build FemboyGram debug APK
-        run: ./gradlew --no-daemon --stacktrace :TMessagesProj_AppStandalone:assembleAfatDebug
+        run: ./gradlew --no-daemon --stacktrace :TMessagesProj_AppStandalone:assembleFemboygramAfatDebug
 
-      - name: Upload debug APK
+      - name: Build ExteraGram debug APK
+        run: ./gradlew --no-daemon --stacktrace :TMessagesProj_AppStandalone:assembleExteragramAfatDebug
+
+      - name: Upload FemboyGram debug APK
         uses: actions/upload-artifact@v4
         with:
           name: femboygram-android-debug
-          path: TMessagesProj_AppStandalone/build/outputs/apk/afat/debug/app.apk
+          path: TMessagesProj_AppStandalone/build/outputs/apk/femboygram/afat/debug/app.apk
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload ExteraGram debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: exteragram-android-debug
+          path: TMessagesProj_AppStandalone/build/outputs/apk/exteragram/afat/debug/app.apk
           if-no-files-found: error
           retention-days: 14
