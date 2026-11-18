@@ -27,6 +27,21 @@ public class ExteraPluginManifestTest {
         return json.getBytes(StandardCharsets.UTF_8);
     }
 
+
+    private static PluginManifest installableManifest(String version, String permissions) {
+        String signature = "A".repeat(86) + "==";
+        String json = new String(manifest("dist/main.js", permissions), StandardCharsets.UTF_8)
+                .replace("\\\"version\\\":\\\"1.0.0\\\"", "\\\"version\\\":\\\"" + version + "\\\"")
+                .replace("\\\"permissions\\\":" + permissions,
+                        "\\\"permissions\\\":" + permissions + ","
+                                + "\\\"sha256\\\":\\\"" + "a".repeat(64) + "\\","
+"
+                                + "\\\"signer_key_id\\\":\\\"publisher-key-0001\\\","
+"
+                                + "\\\"signature\\\":\\\"" + signature + "\\\"");
+        return PluginManifest.parse(json.getBytes(StandardCharsets.UTF_8));
+    }
+
     @Test
     public void acceptsKnownAndroidCapabilities() {
         PluginManifest parsed = PluginManifest.parse(
@@ -248,5 +263,61 @@ public class ExteraPluginManifestTest {
         );
     }
 
+
+
+    @Test
+    public void installationRequiresVerifiedSignedPackageAndOnlyRequestedGrants() {
+        PluginManifest manifest = installableManifest("1.0.0", "[\\\"ui:profile\\\"]");
+        assertThrows(SecurityException.class, () ->
+                PluginInstallation.install(manifest, Collections.singleton("ui:profile"), false)
+        );
+        assertThrows(IllegalArgumentException.class, () ->
+                PluginInstallation.install(manifest, Collections.singleton("network:https"), true)
+        );
+        PluginInstallation installed = PluginInstallation.install(
+                manifest, Collections.singleton("ui:profile"), true
+        );
+        assertEquals(PluginInstallation.State.INSTALLED, installed.state);
+        assertEquals(Collections.singleton("ui:profile"), installed.grantedPermissions());
+    }
+
+    @Test
+    public void updateRequiresConsentAndRevokesRemovedCapabilities() {
+        PluginInstallation installed = PluginInstallation.install(
+                installableManifest("1.0.0", "[\\\"ui:profile\\\"]"),
+                Collections.singleton("ui:profile"), true
+        );
+        PluginManifest addsBanner = installableManifest(
+                "1.1.0", "[\\\"ui:profile\\\",\\\"ui:profile-banner\\\"]"
+        );
+        assertThrows(IllegalArgumentException.class, () ->
+                installed.update(addsBanner, Collections.<String>emptySet(), true)
+        );
+        PluginInstallation approved = installed.update(
+                addsBanner, Collections.singleton("ui:profile-banner"), true
+        );
+        assertEquals(2, approved.grantedPermissions().size());
+
+        PluginManifest removesBanner = installableManifest("1.2.0", "[\\\"ui:profile\\\"]");
+        PluginInstallation cleaned = approved.update(
+                removesBanner, Collections.<String>emptySet(), true
+        );
+        assertEquals(Collections.singleton("ui:profile"), cleaned.grantedPermissions());
+    }
+
+    @Test
+    public void disableEnableAndUninstallHaveExplicitStates() {
+        PluginInstallation installed = PluginInstallation.install(
+                installableManifest("1.0.0", "[\\\"ui:profile\\\"]"),
+                Collections.singleton("ui:profile"), true
+        );
+        PluginInstallation disabled = installed.disable();
+        assertEquals(PluginInstallation.State.DISABLED, disabled.state);
+        assertEquals(PluginInstallation.State.INSTALLED, disabled.enable().state);
+        PluginInstallation removed = disabled.uninstall();
+        assertEquals(PluginInstallation.State.UNINSTALLED, removed.state);
+        assertTrue(removed.grantedPermissions().isEmpty());
+        assertThrows(IllegalStateException.class, removed::enable);
+    }
 
 }
