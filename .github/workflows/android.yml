@@ -72,7 +72,7 @@ jobs:
       - name: Compile ExteraGram application identity
         run: |
           ./gradlew --no-daemon --no-build-cache --stacktrace -PAPP_PACKAGE=com.exteragram.messenger \
-            :TMessagesProj_AppStandalone:processAfatDebugManifest \
+            :TMessagesProj_AppStandalone:processAfatDebugMainManifest \
             :TMessagesProj_AppStandalone:compileAfatDebugJavaWithJavac \
             :TMessagesProj_AppTests:compileAfatDebugAndroidTestJavaWithJavac \
             :TMessagesProj_AppTests:compileAfatDebugAndroidTestKotlin
