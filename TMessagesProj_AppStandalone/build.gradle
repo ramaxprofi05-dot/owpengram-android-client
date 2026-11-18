@@ -101,10 +101,21 @@ android {
         manifest.srcFile '../TMessagesProj/config/release/AndroidManifest_standalone.xml'
     }
 
-    flavorDimensions "minApi"
+    // Separate branded editions install side by side. The minApi dimension
+    // remains independent so ABI/version-code handling stays consistent.
+    flavorDimensions "edition", "minApi"
 
     productFlavors {
+        femboygram {
+            dimension "edition"
+            // Keep APP_PACKAGE from gradle.properties for existing installations.
+        }
+        exteragram {
+            dimension "edition"
+            applicationId "com.exteragram.messenger"
+        }
         afat {
+            dimension "minApi"
             ndk {
                 abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
             }
@@ -122,7 +133,8 @@ android {
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
             outputFileName = "app.apk"
-            output.versionCodeOverride = defaultConfig.versionCode * 10 + variant.productFlavors.get(0).abiVersionCode
+            def abiFlavor = variant.productFlavors.find { it.name == "afat" }
+            output.versionCodeOverride = defaultConfig.versionCode * 10 + abiFlavor.abiVersionCode
         }
     }
 
