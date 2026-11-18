@@ -265,4 +265,11 @@
     <string name="RemindTodayAt">\'Отправить сегодня в\' HH:mm</string>
     <string name="RemindDayAt">\'Отправить\' d MMM \'в\' HH:mm</string>
     <string name="RemindDayYearAt">\'Напомнить\' d MMM yyyy \'в\' HH:mm</string>
+    <string name="ProfileBannerAdd">＋ Добавить баннер профиля</string>
+    <string name="ProfileBannerChange">Изменить баннер</string>
+    <string name="ProfileBannerPickerUnavailable">На устройстве нет доступного выбора изображений</string>
+    <string name="ProfileBannerSavedLocally">Баннер сохранён на этом устройстве</string>
+    <string name="ProfileBannerSaveFailed">Не удалось сохранить баннер профиля</string>
+    <string name="ProfileBannerRemoveTitle">Удалить баннер профиля?</string>
+    <string name="ProfileBannerRemoveMessage">Будет удалён баннер, сохранённый на этом устройстве.</string>
 </resources>
