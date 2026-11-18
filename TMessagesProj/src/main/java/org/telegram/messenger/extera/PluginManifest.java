@@ -26,7 +26,10 @@ public final class PluginManifest {
 
     private static final Pattern ID = Pattern.compile("^[a-z0-9]+(?:[.-][a-z0-9]+){2,}$");
     private static final Pattern SEMVER = Pattern.compile(
-            "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
+            "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)"
+                    + "(?:-((?:0|[1-9][0-9]*|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*)"
+                    + "(?:\\.(?:0|[1-9][0-9]*|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*))*))?"
+                    + "(?:\\+[0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*)?$"
     );
     private static final Pattern SHA256 = Pattern.compile("^[a-f0-9]{64}$");
     private static final Pattern KEY_ID = Pattern.compile("^[a-zA-Z0-9._-]{8,96}$");
