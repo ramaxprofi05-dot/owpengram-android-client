@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
  */
 public final class PluginManifest {
     public static final int MAX_MANIFEST_BYTES = 64 * 1024;
+    private static final int MAX_JSON_NESTING = 32;
 
     private static final Pattern ID = Pattern.compile("^[a-z0-9]+(?:[.-][a-z0-9]+){2,}$");
     private static final Pattern SEMVER = Pattern.compile(
@@ -108,7 +109,7 @@ public final class PluginManifest {
     private static void rejectDuplicateKeys(String jsonText) {
         try (JsonReader reader = new JsonReader(new StringReader(jsonText))) {
             reader.setLenient(false);
-            scanJsonValue(reader);
+            scanJsonValue(reader, 0);
             if (reader.peek() != JsonToken.END_DOCUMENT) {
                 throw new IllegalArgumentException("plugin manifest must contain exactly one JSON value");
             }
@@ -117,8 +118,12 @@ public final class PluginManifest {
         }
     }
 
-    private static void scanJsonValue(JsonReader reader) throws IOException {
+    private static void scanJsonValue(JsonReader reader, int depth) throws IOException {
         JsonToken token = reader.peek();
+        if ((token == JsonToken.BEGIN_OBJECT || token == JsonToken.BEGIN_ARRAY)
+                && depth >= MAX_JSON_NESTING) {
+            throw new IllegalArgumentException("plugin manifest JSON nesting is too deep");
+        }
         switch (token) {
             case BEGIN_OBJECT:
                 reader.beginObject();
@@ -128,13 +133,13 @@ public final class PluginManifest {
                     if (!names.add(name)) {
                         throw new IllegalArgumentException("duplicate plugin manifest key: " + name);
                     }
-                    scanJsonValue(reader);
+                    scanJsonValue(reader, depth + 1);
                 }
                 reader.endObject();
                 return;
             case BEGIN_ARRAY:
                 reader.beginArray();
-                while (reader.hasNext()) scanJsonValue(reader);
+                while (reader.hasNext()) scanJsonValue(reader, depth + 1);
                 reader.endArray();
                 return;
             case STRING:
