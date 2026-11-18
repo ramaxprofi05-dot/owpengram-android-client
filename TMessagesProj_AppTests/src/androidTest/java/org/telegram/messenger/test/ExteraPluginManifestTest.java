@@ -266,7 +266,7 @@ public class ExteraPluginManifestTest {
 
     @Test
     public void installationRequiresVerifiedSignedPackageAndOnlyRequestedGrants() {
-        PluginManifest manifest = installableManifest("1.0.0", "[\\\"ui:profile\\\"]");
+        PluginManifest manifest = installableManifest("1.0.0", "[\"ui:profile\"]");
         assertThrows(SecurityException.class, () ->
                 PluginInstallation.install(manifest, Collections.singleton("ui:profile"), false)
         );
@@ -283,11 +283,11 @@ public class ExteraPluginManifestTest {
     @Test
     public void updateRequiresConsentAndRevokesRemovedCapabilities() {
         PluginInstallation installed = PluginInstallation.install(
-                installableManifest("1.0.0", "[\\\"ui:profile\\\"]"),
+                installableManifest("1.0.0", "[\"ui:profile\"]"),
                 Collections.singleton("ui:profile"), true
         );
         PluginManifest addsBanner = installableManifest(
-                "1.1.0", "[\\\"ui:profile\\\",\\\"ui:profile-banner\\\"]"
+                "1.1.0", "[\"ui:profile\",\"ui:profile-banner\"]"
         );
         assertThrows(IllegalArgumentException.class, () ->
                 installed.update(addsBanner, Collections.<String>emptySet(), true)
@@ -297,7 +297,7 @@ public class ExteraPluginManifestTest {
         );
         assertEquals(2, approved.grantedPermissions().size());
 
-        PluginManifest removesBanner = installableManifest("1.2.0", "[\\\"ui:profile\\\"]");
+        PluginManifest removesBanner = installableManifest("1.2.0", "[\"ui:profile\"]");
         PluginInstallation cleaned = approved.update(
                 removesBanner, Collections.<String>emptySet(), true
         );
@@ -307,7 +307,7 @@ public class ExteraPluginManifestTest {
     @Test
     public void disableEnableAndUninstallHaveExplicitStates() {
         PluginInstallation installed = PluginInstallation.install(
-                installableManifest("1.0.0", "[\\\"ui:profile\\\"]"),
+                installableManifest("1.0.0", "[\"ui:profile\"]"),
                 Collections.singleton("ui:profile"), true
         );
         PluginInstallation disabled = installed.disable();
