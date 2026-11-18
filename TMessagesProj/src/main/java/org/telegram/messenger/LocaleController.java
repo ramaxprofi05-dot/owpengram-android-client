@@ -1463,22 +1463,33 @@ public class LocaleController {
         return getStringInternal(key, null, res);
     }
 
+    private String applyEditionBranding(String value) {
+        if (value == null || !BuildVars.isExteraGram()) {
+            return value;
+        }
+        // URL resources can contain the FemboyGram support handle; never rewrite
+        // destinations while adapting visible product names for ExteraGram.
+        if (value.startsWith("https://") || value.startsWith("http://")) {
+            return value;
+        }
+        return value.replace("FemboyGram", "ExteraGram");
+    }
+
     private String getStringInternal(String key, String fallback, int res) {
         final String value = getStringV2(key, res, fallback);
         if (value == null) {
             return "LOC_ERR:" + key;
         }
-        // The two editions share the Telegram-derived localization catalogue,
-        // but must never expose the other edition's brand in user-facing text.
-        return BuildVars.isExteraGram() ? value.replace("FemboyGram", "ExteraGram") : value;
+        return applyEditionBranding(value);
     }
 
     public static String getServerString(String key) {
-        String value = getInstance().localizationExternal.getByResName(key);
+        LocaleController instance = getInstance();
+        String value = instance.localizationExternal.getByResName(key);
         if (value == null) {
-            value = getInstance().getLocalizedString(key);
+            value = instance.getLocalizedString(key);
         }
-        return value;
+        return instance.applyEditionBranding(value);
     }
 
     public static String getString(@StringRes int res) {
