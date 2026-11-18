@@ -41,6 +41,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -13066,12 +13067,18 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         File destination = new File(directory,
                 "banner_" + currentAccount + "_" + getUserConfig().getClientUserId() + ".image");
         File temporary = new File(directory, destination.getName() + ".tmp");
+        File backup = new File(directory, destination.getName() + ".bak");
+        boolean previousMovedToBackup = false;
+        boolean newBannerInstalled = false;
         try {
             if (!directory.exists() && !directory.mkdirs()) {
                 throw new IllegalStateException("Could not create profile banner directory");
             }
             if (temporary.exists() && !temporary.delete()) {
                 throw new IllegalStateException("Could not clear temporary profile banner");
+            }
+            if (backup.exists() && !backup.delete()) {
+                throw new IllegalStateException("Could not clear previous profile banner backup");
             }
 
             long copied = 0;
@@ -13095,12 +13102,30 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             if (copied == 0) {
                 throw new IllegalStateException("Selected image is empty");
             }
-            if (destination.exists() && !destination.delete()) {
-                throw new IllegalStateException("Could not replace previous profile banner");
+
+            // Validate the actual file, not only the provider's MIME type. This
+            // prevents corrupt/non-image content and extreme dimensions from
+            // replacing a previously working banner.
+            BitmapFactory.Options bounds = new BitmapFactory.Options();
+            bounds.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(temporary.getAbsolutePath(), bounds);
+            long pixels = (long) bounds.outWidth * (long) bounds.outHeight;
+            if (bounds.outWidth <= 0 || bounds.outHeight <= 0
+                    || bounds.outWidth > 12000 || bounds.outHeight > 12000
+                    || pixels > 60_000_000L) {
+                throw new IllegalStateException("Selected file is not a supported image");
+            }
+
+            if (destination.exists()) {
+                if (!destination.renameTo(backup)) {
+                    throw new IllegalStateException("Could not preserve previous profile banner");
+                }
+                previousMovedToBackup = true;
             }
             if (!temporary.renameTo(destination)) {
-                throw new IllegalStateException("Could not save selected profile banner");
+                throw new IllegalStateException("Could not install selected profile banner");
             }
+            newBannerInstalled = true;
 
             activity.getSharedPreferences("profile_banners", Context.MODE_PRIVATE)
                     .edit()
@@ -13109,13 +13134,27 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             if (profileBannerView != null) {
                 profileBannerView.setImageFile(destination);
             }
+            if (backup.exists() && !backup.delete()) {
+                FileLog.e("Could not delete previous profile banner backup");
+            }
             Toast.makeText(activity, R.string.ProfileBannerSavedLocally, Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             FileLog.e(e);
+            if (!newBannerInstalled && previousMovedToBackup && backup.exists()) {
+                if (destination.exists() && !destination.delete()) {
+                    FileLog.e("Could not remove incomplete profile banner");
+                }
+                if (!backup.renameTo(destination)) {
+                    FileLog.e("Could not restore previous profile banner");
+                }
+            }
             Toast.makeText(activity, R.string.ProfileBannerSaveFailed, Toast.LENGTH_SHORT).show();
         } finally {
-            if (temporary.exists()) {
-                temporary.delete();
+            if (temporary.exists() && !temporary.delete()) {
+                FileLog.e("Could not delete temporary profile banner");
+            }
+            if (newBannerInstalled && backup.exists() && !backup.delete()) {
+                FileLog.e("Could not delete stale profile banner backup");
             }
         }
     }
