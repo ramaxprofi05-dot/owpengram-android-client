@@ -1,0 +1,162 @@
+name: FemboyGram Android
+
+on:
+  push:
+    branches: [femboygram]
+    paths:
+      - '**'
+      - '.github/workflows/android.yml'
+  pull_request:
+    branches: [femboygram]
+    paths:
+      - '**'
+      - '.github/workflows/android.yml'
+  workflow_dispatch:
+    inputs:
+      build_apk:
+        description: "Разрешить сборку APK (только после завершения разработки)"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: femboygram-android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+      FEMBOYGRAM_API_ID: ${{ secrets.FEMBOYGRAM_API_ID }}
+      FEMBOYGRAM_API_HASH: ${{ secrets.FEMBOYGRAM_API_HASH }}
+    steps:
+      - name: Checkout with submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Android compile toolchain
+        run: |
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager -print -quit)"
+          test -n "$SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses
+          "$SDKMANAGER" --install "platforms;android-36" "build-tools;36.0.0" "ndk;27.2.12479018" "cmake;3.22.1"
+
+      # The editions share the native OwpenGram source tree, but must each be
+      # configured and compiled with their own application identity. This is
+      # intentionally compile-only: no APK is packaged before release approval.
+      - name: Compile FemboyGram application identity
+        run: |
+          ./gradlew --no-daemon --no-build-cache --stacktrace -PAPP_PACKAGE=com.femboygram.messenger \
+            :TMessagesProj_AppStandalone:processAfatDebugMainManifest \
+            :TMessagesProj_AppStandalone:compileAfatDebugJavaWithJavac \
+            :TMessagesProj_AppTests:compileAfatDebugAndroidTestJavaWithJavac \
+            :TMessagesProj_AppTests:compileAfatDebugAndroidTestKotlin
+          MERGED_MANIFEST="$(find TMessagesProj_AppStandalone/build/intermediates/merged_manifest -type f -name AndroidManifest.xml -print -quit)"
+          test -n "$MERGED_MANIFEST"
+          grep -F 'android:label="FemboyGram"' "$MERGED_MANIFEST"
+          grep -F 'android:icon="@mipmap/ic_launcher"' "$MERGED_MANIFEST"
+          grep -F 'android:roundIcon="@mipmap/ic_launcher_round"' "$MERGED_MANIFEST"
+          BUILD_CONFIG="$(find TMessagesProj/build/generated/source/buildConfig -type f -name BuildConfig.java -print -quit)"
+          test -n "$BUILD_CONFIG"
+          grep -F 'APP_EDITION = "femboy"' "$BUILD_CONFIG"
+
+      - name: Compile ExteraGram application identity
+        run: |
+          ./gradlew --no-daemon --no-build-cache --stacktrace -PAPP_PACKAGE=com.exteragram.messenger \
+            :TMessagesProj_AppStandalone:processAfatDebugMainManifest \
+            :TMessagesProj_AppStandalone:compileAfatDebugJavaWithJavac \
+            :TMessagesProj_AppTests:compileAfatDebugAndroidTestJavaWithJavac \
+            :TMessagesProj_AppTests:compileAfatDebugAndroidTestKotlin
+          MERGED_MANIFEST="$(find TMessagesProj_AppStandalone/build/intermediates/merged_manifest -type f -name AndroidManifest.xml -print -quit)"
+          test -n "$MERGED_MANIFEST"
+          grep -F 'android:label="ExteraGram"' "$MERGED_MANIFEST"
+          grep -F 'android:icon="@mipmap/ic_launcher_extera"' "$MERGED_MANIFEST"
+          grep -F 'android:roundIcon="@mipmap/ic_launcher_extera"' "$MERGED_MANIFEST"
+          BUILD_CONFIG="$(find TMessagesProj/build/generated/source/buildConfig -type f -name BuildConfig.java -print -quit)"
+          test -n "$BUILD_CONFIG"
+          grep -F 'APP_EDITION = "extera"' "$BUILD_CONFIG"
+
+  build:
+    needs: verify
+    if: ${{ needs.verify.result == 'success' && ((github.event_name == 'workflow_dispatch' && inputs.build_apk) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[build-apk]'))) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+      FEMBOYGRAM_API_ID: ${{ secrets.FEMBOYGRAM_API_ID }}
+      FEMBOYGRAM_API_HASH: ${{ secrets.FEMBOYGRAM_API_HASH }}
+    steps:
+      - name: Checkout with submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Validate FemboyGram API credentials
+        shell: bash
+        run: |
+          [[ "$FEMBOYGRAM_API_ID" =~ ^[1-9][0-9]*$ ]]
+          [[ "$FEMBOYGRAM_API_HASH" =~ ^[a-fA-F0-9]{32}$ ]]
+
+      - name: Install Android build tools
+        run: |
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager -print -quit)"
+          test -n "$SDKMANAGER"
+          yes | "$SDKMANAGER" --licenses
+          "$SDKMANAGER" --install "platforms;android-36" "build-tools;36.0.0" "ndk;27.2.12479018" "cmake;3.22.1"
+
+      - name: Assemble and verify FemboyGram APK
+        run: |
+          ./gradlew --no-daemon --stacktrace -PAPP_PACKAGE=com.femboygram.messenger \
+            :TMessagesProj_AppStandalone:assembleAfatDebug
+          mkdir -p dist
+          APK="TMessagesProj_AppStandalone/build/outputs/apk/afat/debug/app.apk"
+          test -s "$APK"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | \
+            grep -F "package: name='com.femboygram.messenger'"
+          cp "$APK" dist/FemboyGram-debug.apk
+
+      - name: Assemble and verify ExteraGram APK
+        run: |
+          ./gradlew --no-daemon --stacktrace -PAPP_PACKAGE=com.exteragram.messenger \
+            :TMessagesProj_AppStandalone:assembleAfatDebug
+          APK="TMessagesProj_AppStandalone/build/outputs/apk/afat/debug/app.apk"
+          test -s "$APK"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | \
+            grep -F "package: name='com.exteragram.messenger'"
+          cp "$APK" dist/ExteraGram-debug.apk
+
+      - name: Verify staged APK artifacts
+        run: |
+          test -s dist/FemboyGram-debug.apk
+          test -s dist/ExteraGram-debug.apk
+          test "$(sha256sum dist/FemboyGram-debug.apk | cut -d' ' -f1)" != \
+               "$(sha256sum dist/ExteraGram-debug.apk | cut -d' ' -f1)"
+
+      - name: Upload both APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: femboygram-and-exteragram-debug
+          path: dist/*.apk
+          if-no-files-found: error
+          retention-days: 14
