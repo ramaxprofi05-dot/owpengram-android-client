@@ -22,8 +22,9 @@ on:
 permissions:
   contents: read
 
-# Each commit gets its own verification run. A slow recursive submodule checkout
-# must not hold newer fixes in the same PR in a pending concurrency queue.
+concurrency:
+  group: femboygram-android-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   verify:
