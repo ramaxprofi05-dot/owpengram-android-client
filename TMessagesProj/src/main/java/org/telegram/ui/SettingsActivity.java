@@ -1011,7 +1011,8 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
             // 0 is a local dev build.
             versionName += BuildVars.OWPENGRAM_BUILD > 0 ? "_O" + BuildVars.OWPENGRAM_BUILD : "_dev";
 
-            return "OwpenGram " + String.format(Locale.US, "v%s (%d)\n%s", versionName, code, abi);
+            String appName = BuildVars.isExteraGram() ? "ExteraGram" : "FemboyGram";
+            return appName + " " + String.format(Locale.US, "v%s (%d)\n%s", versionName, code, abi);
         } catch (Exception e) {
             FileLog.e(e);
         }
