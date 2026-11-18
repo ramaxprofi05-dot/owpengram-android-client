@@ -127,7 +127,10 @@ public class ProfileBannerView extends FrameLayout {
         BitmapFactory.Options bounds = new BitmapFactory.Options();
         bounds.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(file.getAbsolutePath(), bounds);
-        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) {
+        long pixelCount = (long) bounds.outWidth * (long) bounds.outHeight;
+        if (bounds.outWidth <= 0 || bounds.outHeight <= 0
+                || bounds.outWidth > 12000 || bounds.outHeight > 12000
+                || pixelCount > 60_000_000L) {
             return null;
         }
 
@@ -139,6 +142,10 @@ public class ProfileBannerView extends FrameLayout {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inSampleSize = sampleSize;
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        return BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+        try {
+            return BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+        } catch (OutOfMemoryError error) {
+            return null;
+        }
     }
 }
