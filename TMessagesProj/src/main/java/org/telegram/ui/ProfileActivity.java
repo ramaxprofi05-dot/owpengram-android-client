@@ -5377,7 +5377,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             String bannerPath = context.getSharedPreferences("profile_banners", Context.MODE_PRIVATE)
                     .getString(getProfileBannerPreferenceKey(), null);
             if (bannerPath != null) {
-                profileBannerView.setImageFile(new File(bannerPath));
+                File bannerFile = new File(bannerPath);
+                recoverProfileBannerFile(bannerFile);
+                profileBannerView.setImageFile(bannerFile);
             }
             avatarContainer2.addView(profileBannerView, 0, new FrameLayout.LayoutParams(
                     FrameLayout.LayoutParams.MATCH_PARENT, getHeaderOnlyExtraHeight(), Gravity.TOP | Gravity.LEFT
@@ -13042,6 +13044,20 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         return "banner_" + currentAccount + "_" + getUserConfig().getClientUserId();
     }
 
+    private void recoverProfileBannerFile(File destination) {
+        File backup = new File(destination.getParentFile(), destination.getName() + ".bak");
+        if (!backup.exists()) {
+            return;
+        }
+        if (!destination.exists()) {
+            if (!backup.renameTo(destination)) {
+                FileLog.e("Could not restore interrupted profile banner replacement");
+            }
+        } else if (!backup.delete()) {
+            FileLog.e("Could not delete stale profile banner backup");
+        }
+    }
+
     private void openProfileBannerPicker() {
         if (!myProfile || getParentActivity() == null) {
             return;
@@ -13077,17 +13093,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             if (temporary.exists() && !temporary.delete()) {
                 throw new IllegalStateException("Could not clear temporary profile banner");
             }
-            // Recover a previous banner if the process was interrupted between
-            // moving the destination aside and installing the replacement.
-            if (backup.exists()) {
-                if (!destination.exists()) {
-                    if (!backup.renameTo(destination)) {
-                        throw new IllegalStateException("Could not restore interrupted profile banner replacement");
-                    }
-                } else if (!backup.delete()) {
-                    throw new IllegalStateException("Could not clear previous profile banner backup");
-                }
-            }
+            recoverProfileBannerFile(destination);
 
             long copied = 0;
             try (InputStream input = activity.getContentResolver().openInputStream(source);
