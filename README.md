@@ -133,10 +133,14 @@ Run the interactive build script — double-click it or run from a terminal:
 build-android.bat
 ```
 
-It guides you through API credentials, the keystore, SDK setup and the Gradle
-build, and remembers your answers in `.owpengram-build.local.json` (gitignored).
-It builds the `:TMessagesProj_AppStandalone` flavour — the unrestricted,
-Firebase-free one that ships in Releases.
+It asks which edition to build (FemboyGram or ExteraGram), then checks the
+API credentials, JDK, Android SDK and submodules before invoking Gradle. The
+local API credentials file `api_credentials.local.ps1` is gitignored; you can
+also provide `FEMBOYGRAM_API_ID` and `FEMBOYGRAM_API_HASH` as environment
+variables. It builds the `:TMessagesProj_AppStandalone` unrestricted,
+Firebase-free variant. FemboyGram keeps the existing
+`com.femboygram.messenger` application ID; ExteraGram uses
+`com.exteragram.messenger`, so the two editions can be installed side by side.
 
 The script also asks for the **release number** of the build — the N in the
 GitHub tag `ON` (for example `8` for `O8`). The in-app updater offers any
@@ -173,4 +177,4 @@ under **GNU GPL v2 or later** ([LICENSE](LICENSE)).
 
 ## FemboyGram fork: API credentials
 
-The FemboyGram fork deliberately does not reuse OwpenGram's Telegram API credentials, Google client IDs, SafetyNet key, store links, or release updater. Create an application at https://my.telegram.org/apps and configure the repository Actions secrets `FEMBOYGRAM_API_ID` and `FEMBOYGRAM_API_HASH`. The Android build compiles with an empty credential fallback for CI, but authentication is not expected to work until the FemboyGram credentials are supplied. Passkeys and store billing remain disabled until FemboyGram has its own verified app integrations.
+The FemboyGram/ExteraGram fork deliberately does not reuse OwpenGram's Telegram API credentials, Google client IDs, SafetyNet key, store links, or release updater. Create a project API application and configure the repository Actions secrets `FEMBOYGRAM_API_ID` and `FEMBOYGRAM_API_HASH`. Local builds may use the ignored `api_credentials.local.ps1` file based on `api_credentials.local.ps1.example`, or the same environment variables. The Gradle build injects these values into BuildConfig; the source tree is not rewritten. Passkeys and store billing remain disabled until each edition has its own verified app integrations.
