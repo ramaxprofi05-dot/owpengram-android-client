@@ -13126,9 +13126,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             return;
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle(R.string.ProfileBannerRemoveTitle);
-        builder.setMessage(R.string.ProfileBannerRemoveMessage);
-        builder.setPositiveButton(R.string.Remove, (dialog, which) -> {
+        builder.setTitle(LocaleController.getString(R.string.ProfileBannerRemoveTitle));
+        builder.setMessage(LocaleController.getString(R.string.ProfileBannerRemoveMessage));
+        builder.setPositiveButton(LocaleController.getString(R.string.Remove), (dialog, which) -> {
             SharedPreferences preferences = activity.getSharedPreferences("profile_banners", Context.MODE_PRIVATE);
             String path = preferences.getString(getProfileBannerPreferenceKey(), null);
             preferences.edit().remove(getProfileBannerPreferenceKey()).apply();
@@ -13142,7 +13142,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 profileBannerView.clearImage();
             }
         });
-        builder.setNegativeButton(R.string.Cancel, null);
+        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
         showDialog(builder.create());
     }
 
