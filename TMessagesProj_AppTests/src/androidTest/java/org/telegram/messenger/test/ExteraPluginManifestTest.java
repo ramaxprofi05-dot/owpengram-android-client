@@ -3,6 +3,7 @@ package org.telegram.messenger.test;
 import org.junit.Test;
 import org.telegram.messenger.extera.PluginCapability;
 import org.telegram.messenger.extera.PluginManifest;
+import org.telegram.messenger.extera.PluginInstallation;
 import org.telegram.messenger.extera.PluginPermissionReview;
 
 import java.nio.charset.StandardCharsets;
@@ -31,14 +32,12 @@ public class ExteraPluginManifestTest {
     private static PluginManifest installableManifest(String version, String permissions) {
         String signature = "A".repeat(86) + "==";
         String json = new String(manifest("dist/main.js", permissions), StandardCharsets.UTF_8)
-                .replace("\\\"version\\\":\\\"1.0.0\\\"", "\\\"version\\\":\\\"" + version + "\\\"")
-                .replace("\\\"permissions\\\":" + permissions,
-                        "\\\"permissions\\\":" + permissions + ","
-                                + "\\\"sha256\\\":\\\"" + "a".repeat(64) + "\\","
-"
-                                + "\\\"signer_key_id\\\":\\\"publisher-key-0001\\\","
-"
-                                + "\\\"signature\\\":\\\"" + signature + "\\\"");
+                .replace("\"version\":\"1.0.0\"", "\"version\":\"" + version + "\"")
+                .replace("\"permissions\":" + permissions,
+                        "\"permissions\":" + permissions + ","
+                                + "\"sha256\":\"" + "a".repeat(64) + "\","
+                                + "\"signer_key_id\":\"publisher-key-0001\","
+                                + "\"signature\":\"" + signature + "\"");
         return PluginManifest.parse(json.getBytes(StandardCharsets.UTF_8));
     }
 
