@@ -26,6 +26,11 @@ public class BuildVars {
     public static boolean NO_SCOPED_STORAGE = Build.VERSION.SDK_INT <= 29;
     public static String BUILD_VERSION_STRING = BuildConfig.BUILD_VERSION_STRING;
     public static int OWPENGRAM_BUILD = BuildConfig.OWPENGRAM_BUILD;
+    public static final String APP_EDITION = BuildConfig.APP_EDITION;
+
+    public static boolean isExteraGram() {
+        return "extera".equals(APP_EDITION);
+    }
 
     public static int APP_ID = BuildConfig.FEMBOYGRAM_API_ID;
     public static String APP_HASH = BuildConfig.FEMBOYGRAM_API_HASH;
