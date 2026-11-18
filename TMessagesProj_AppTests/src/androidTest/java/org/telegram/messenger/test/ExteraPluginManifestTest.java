@@ -286,6 +286,12 @@ public class ExteraPluginManifestTest {
                 installableManifest("1.0.0", "[\"ui:profile\"]"),
                 Collections.singleton("ui:profile"), true
         );
+        assertThrows(IllegalArgumentException.class, () ->
+                installed.update(
+                        installableManifest("0.9.9", "[\"ui:profile\"]"),
+                        Collections.<String>emptySet(), true
+                )
+        );
         PluginManifest addsBanner = installableManifest(
                 "1.1.0", "[\"ui:profile\",\"ui:profile-banner\"]"
         );
