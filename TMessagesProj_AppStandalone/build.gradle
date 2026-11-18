@@ -111,6 +111,8 @@ android {
         exteragram {
             dimension "edition"
             applicationId "com.exteragram.messenger"
+            resValue "string", "AppName", "ExteraGram"
+            resValue "string", "AppNameBeta", "ExteraGram Beta"
         }
         afat {
             dimension "minApi"
