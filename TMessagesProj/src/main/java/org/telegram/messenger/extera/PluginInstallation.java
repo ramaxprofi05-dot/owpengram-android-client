@@ -23,11 +23,13 @@ public final class PluginInstallation {
     public final PluginManifest manifest;
     private final Set<String> grantedPermissions;
     public final State state;
+    private final boolean packageVerified;
 
     private PluginInstallation(
             PluginManifest manifest,
             Set<String> grantedPermissions,
-            State state
+            State state,
+            boolean packageVerified
     ) {
         if (manifest == null || state == null) {
             throw new IllegalArgumentException("Manifest and installation state are required");
@@ -35,6 +37,7 @@ public final class PluginInstallation {
         this.manifest = manifest;
         this.grantedPermissions = immutableSorted(grantedPermissions);
         this.state = state;
+        this.packageVerified = packageVerified;
     }
 
     public static PluginInstallation install(
@@ -44,19 +47,19 @@ public final class PluginInstallation {
     ) {
         requireVerifiedInstallable(manifest, packageVerified);
         Set<String> approved = validatedGrants(manifest, approvedPermissions);
-        return new PluginInstallation(manifest, approved, State.INSTALLED);
+        return new PluginInstallation(manifest, approved, State.INSTALLED, true);
     }
 
     public PluginInstallation disable() {
         requireInstalled();
         if (state == State.DISABLED) return this;
-        return new PluginInstallation(manifest, grantedPermissions, State.DISABLED);
+        return new PluginInstallation(manifest, grantedPermissions, State.DISABLED, packageVerified);
     }
 
     public PluginInstallation enable() {
         requireInstalled();
         if (state == State.INSTALLED) return this;
-        return new PluginInstallation(manifest, grantedPermissions, State.INSTALLED);
+        return new PluginInstallation(manifest, grantedPermissions, State.INSTALLED, packageVerified);
     }
 
     /**
@@ -93,16 +96,35 @@ public final class PluginInstallation {
             throw new IllegalArgumentException("New plugin capabilities require explicit approval");
         }
 
-        return new PluginInstallation(updatedManifest, review.requested(), state);
+        return new PluginInstallation(updatedManifest, review.requested(), state, true);
     }
 
     public PluginInstallation uninstall() {
         if (state == State.UNINSTALLED) return this;
-        return new PluginInstallation(manifest, Collections.<String>emptySet(), State.UNINSTALLED);
+        return new PluginInstallation(manifest, Collections.<String>emptySet(), State.UNINSTALLED, false);
     }
 
     public Set<String> grantedPermissions() {
         return grantedPermissions;
+    }
+
+    public boolean isPackageVerified() {
+        return packageVerified;
+    }
+
+    /** Call only after the trusted package verifier has successfully checked the stored archive. */
+    public PluginInstallation afterPackageVerification(boolean verified) {
+        if (!verified) throw new SecurityException("Plugin package verification failed");
+        if (state == State.UNINSTALLED) throw new IllegalStateException("Plugin has been uninstalled");
+        return new PluginInstallation(manifest, grantedPermissions, state, true);
+    }
+
+    /** Persisted metadata is untrusted until its package archive is verified again. */
+    static PluginInstallation restorePersisted(PluginManifest manifest, Set<String> grants, State state) {
+        if (manifest == null || !manifest.isInstallable() || state == null || state == State.UNINSTALLED) {
+            throw new IllegalArgumentException("Persisted plugin record is invalid");
+        }
+        return new PluginInstallation(manifest, validatedGrants(manifest, grants), state, false);
     }
 
 
