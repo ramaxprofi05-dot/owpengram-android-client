@@ -270,7 +270,8 @@ try {
     $BuildTypeCap  = (Get-Culture).TextInfo.ToTitleCase($ApkBuildTypeDir)
     $EditionCap = (Get-Culture).TextInfo.ToTitleCase($Edition)
     $GradleTask = "${GradleModule}:assemble${EditionCap}Afat$BuildTypeCap"
-    $ApkPath = Join-Path $RepoRoot "TMessagesProj_AppStandalone\build\outputs\apk\$Edition\afat\$ApkBuildTypeDir\app.apk"
+    $ApkVariantDir = "$Edition" + "Afat"
+    $ApkPath = Join-Path $RepoRoot "TMessagesProj_AppStandalone\build\outputs\apk\$ApkVariantDir\$ApkBuildTypeDir\app.apk"
 
     Write-Ok "Edition: $Edition"
     Write-Ok "Build type: $BuildType"
