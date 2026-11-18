@@ -367,7 +367,7 @@ public class ExteraPluginManifestTest {
 
         try {
             PluginInstallation installation = PluginInstallation.install(
-                    installableManifest("1.0.0", "[\\"ui:profile\\"]"),
+                    installableManifest("1.0.0", "[\"ui:profile\"]"),
                     Collections.singleton("ui:profile"), true
             ).disable();
             PluginRegistry registry = new PluginRegistry(context);
