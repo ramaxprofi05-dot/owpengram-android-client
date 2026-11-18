@@ -336,13 +336,14 @@ try {
     Write-Step "Gradle $GradleTask"
     Invoke-Gradle -Task $GradleTask -Label "assemble-$Edition-$BuildType"
 
-    if (Test-Path $ApkPath) {
-        Write-Ok "APK: $ApkPath"
+    if (-not (Test-Path -LiteralPath $ApkPath -PathType Leaf)) {
+        throw "Gradle completed but the expected APK was not created: $ApkPath"
     }
-    else {
-        Write-Host "[WARN] APK not found at: $ApkPath" -ForegroundColor Yellow
-        Write-Host "       Check folder: $(Join-Path $RepoRoot 'TMessagesProj_AppStandalone\build\outputs\apk')" -ForegroundColor Yellow
+    $apkInfo = Get-Item -LiteralPath $ApkPath
+    if ($apkInfo.Length -le 0) {
+        throw "Gradle produced an empty APK file: $ApkPath"
     }
+    Write-Ok "APK: $ApkPath ($($apkInfo.Length) bytes)"
 }
 catch {
     Write-Err $_.Exception.Message
