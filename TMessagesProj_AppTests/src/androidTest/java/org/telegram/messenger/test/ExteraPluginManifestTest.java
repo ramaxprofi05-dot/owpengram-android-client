@@ -217,4 +217,19 @@ public class ExteraPluginManifestTest {
         );
     }
 
+    @Test
+    public void acceptsCanonicalSignatureEncodingWithCompleteIntegrityMetadata() {
+        String validSignature = "A".repeat(86) + "==";
+        String signedManifest = new String(manifest("dist/main.js", "[]"), StandardCharsets.UTF_8)
+                .replace("\\"permissions\\":[]",
+                        "\\"permissions\\":[],"
+                                + "\\"sha256\\":\\"" + "a".repeat(64) + "\\","
+                                + "\\"signer_key_id\\":\\"publisher-key-0001\\","
+                                + "\\"signature\\":\\"" + validSignature + "\\"");
+        PluginManifest parsed = PluginManifest.parse(signedManifest.getBytes(StandardCharsets.UTF_8));
+        assertTrue(parsed.isInstallable());
+        assertEquals(validSignature, parsed.signature);
+    }
+
+
 }
