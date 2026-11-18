@@ -39,6 +39,8 @@ public final class PluginPermissionReview {
 
         Set<String> validated = new TreeSet<>();
         for (String permission : requested) {
+            // Validate before inserting into TreeSet: it rejects null with an
+            // implementation-specific NullPointerException instead of our API error.
             if (!PluginCapability.isAllowed(permission, target)) {
                 throw new IllegalArgumentException(
                         "Unknown or target-incompatible plugin capability: " + permission
