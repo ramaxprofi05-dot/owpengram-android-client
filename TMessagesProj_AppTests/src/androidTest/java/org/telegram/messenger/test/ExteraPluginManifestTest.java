@@ -141,7 +141,7 @@ public class ExteraPluginManifestTest {
 
         String validSignature = "A".repeat(86) + "==";
         String withNonCanonicalSignature = new String(manifest("dist/main.js", "[]"), StandardCharsets.UTF_8)
-                .replace("\\"permissions\\":[]", "\\"permissions\\":[],\\"signature\\":\\"" + validSignature + "\\n\\"");
+                .replace("\"permissions\":[]", "\"permissions\":[],\"signature\":\"" + validSignature + "\\n\"");
         assertThrows(IllegalArgumentException.class, () ->
                 PluginManifest.parse(withNonCanonicalSignature.getBytes(StandardCharsets.UTF_8))
         );
