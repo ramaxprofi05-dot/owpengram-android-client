@@ -66,13 +66,11 @@ android {
     }
 
     buildTypes {
-        // No applicationIdSuffix here (unlike upstream Telegram-Android's
-        // own AppStandalone, which keeps ".web" so its Play and
-        // direct-download builds can coexist as separate installs): this
-        // fork only ever
-        // wants ONE installed app per device, sharing the same
-        // applicationId as :TMessagesProj_App. Debug builds use the generated
-        // debug key; production releases will use a FemboyGram-owned key.
+        // Keep one package ID per branded edition. FemboyGram retains APP_PACKAGE;
+        // ExteraGram overrides it in its product flavor, so both editions can
+        // coexist. Debug and standalone variants within each edition share that
+        // edition's applicationId. Debug uses the generated debug key; production
+        // standalone releases use the configured release keystore.
         debug {
             debuggable true
             jniDebuggable true
