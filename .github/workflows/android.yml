@@ -37,10 +37,17 @@ jobs:
       FEMBOYGRAM_API_ID: ${{ secrets.FEMBOYGRAM_API_ID }}
       FEMBOYGRAM_API_HASH: ${{ secrets.FEMBOYGRAM_API_HASH }}
     steps:
-      - name: Checkout with submodules
+      - name: Checkout source for Java verification
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: false
+          fetch-depth: 1
+
+      # Gradle settings include these two source modules even for Java-only
+      # compile tasks. Native codec/NDK submodules are intentionally deferred
+      # to the APK packaging job.
+      - name: Fetch required Java source submodules
+        run: git submodule update --init --depth 1 TMessagesProj_Modules/media TMessagesProj/lib/jlatexmath
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4

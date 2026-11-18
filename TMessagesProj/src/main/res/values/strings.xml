@@ -11649,4 +11649,11 @@
     <string name="NoPaidMessagesTokenUsed">un1 used your QR code and can message you for free</string>
     <string name="NoPaidMessagesTokenUsedOut">You used the QR code of un1 and can message them for free</string>
     <string name="NoPaidMessagesTokenImported">You can now message **%1$s** for free.</string>
+    <string name="ProfileBannerAdd">＋ Add profile banner</string>
+    <string name="ProfileBannerChange">Change banner</string>
+    <string name="ProfileBannerPickerUnavailable">No image picker is available on this device</string>
+    <string name="ProfileBannerSavedLocally">Banner saved on this device</string>
+    <string name="ProfileBannerSaveFailed">Could not save profile banner</string>
+    <string name="ProfileBannerRemoveTitle">Remove profile banner?</string>
+    <string name="ProfileBannerRemoveMessage">This removes the banner saved on this device.</string>
 </resources>

@@ -1,7 +1,9 @@
 ﻿#Requires -Version 5.1
 param(
     [ValidateSet('debug','release')]
-    [string]$BuildType = ''
+    [string]$BuildType = '',
+    [ValidateSet('femboygram','exteragram')]
+    [string]$Edition = ''
 )
 
 Set-StrictMode -Version Latest
@@ -9,7 +11,6 @@ $ErrorActionPreference = 'Stop'
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $RepoRoot = (Resolve-Path (Join-Path $ScriptDir '..')).Path
-$BuildVarsFile = Join-Path $RepoRoot 'TMessagesProj\src\main\java\org\telegram\messenger\BuildVars.java'
 $LocalPropertiesFile = Join-Path $RepoRoot 'local.properties'
 $GradlewBat = Join-Path $RepoRoot 'gradlew.bat'
 
@@ -17,6 +18,14 @@ $TestApiId = '17349'
 $TestApiHash = '344583e45741c457fe1862106095a5eb'
 
 function Get-ApiCredentials {
+    if ($env:FEMBOYGRAM_API_ID -match '^\d+$' -and $env:FEMBOYGRAM_API_HASH -match '^[0-9a-fA-F]{32}$') {
+        return @{
+            Id = $env:FEMBOYGRAM_API_ID.Trim()
+            Hash = $env:FEMBOYGRAM_API_HASH.Trim()
+            Source = 'environment'
+        }
+    }
+
     $candidates = @(
         (Join-Path $RepoRoot 'api_credentials.local.ps1'),
         (Join-Path (Split-Path $RepoRoot -Parent) 'api_credentials.local.ps1')
@@ -24,23 +33,19 @@ function Get-ApiCredentials {
     foreach ($file in $candidates) {
         if (-not (Test-Path $file)) { continue }
         . $file
-        if ([string]::IsNullOrWhiteSpace($TDESKTOP_API_ID) -or [string]::IsNullOrWhiteSpace($TDESKTOP_API_HASH)) {
-            throw "$file must set `$TDESKTOP_API_ID and `$TDESKTOP_API_HASH"
+        $id = [string]$TDESKTOP_API_ID
+        $hash = [string]$TDESKTOP_API_HASH
+        if ($id.Trim() -match '^\d+$' -and $hash.Trim() -match '^[0-9a-fA-F]{32}$') {
+            return @{
+                Id = $id.Trim()
+                Hash = $hash.Trim()
+                Source = (Split-Path $file -Leaf)
+            }
         }
-        return @{
-            Id = $TDESKTOP_API_ID.Trim()
-            Hash = $TDESKTOP_API_HASH.Trim()
-            Source = (Split-Path $file -Leaf)
-        }
+        Write-Host "[WARN] $file still contains placeholder or invalid credentials." -ForegroundColor Yellow
     }
 
-    Write-Host '[WARN] api_credentials.local.ps1 not found - using TEST credentials.' -ForegroundColor Yellow
-    Write-Host '       Copy api_credentials.local.ps1.example and add your api_id/api_hash for Telegram login.' -ForegroundColor Yellow
-    return @{
-        Id = $TestApiId
-        Hash = $TestApiHash
-        Source = 'test defaults'
-    }
+    throw "FemboyGram API credentials are missing. Set FEMBOYGRAM_API_ID/FEMBOYGRAM_API_HASH or fill api_credentials.local.ps1 from https://my.telegram.org/apps."
 }
 
 function Write-Step([string]$Text) { Write-Host "`n>> $Text" -ForegroundColor Yellow }
@@ -60,12 +65,29 @@ function Read-BuildType {
     return 'debug'
 }
 
-function Patch-Api([string]$ApiId, [string]$ApiHash) {
-    $content = Get-Content -Path $BuildVarsFile -Raw -Encoding UTF8
-    $content = [regex]::Replace($content, 'public static int APP_ID = \d+;', "public static int APP_ID = $ApiId;")
-    $content = [regex]::Replace($content, 'public static String APP_HASH = "[^"]*";', "public static String APP_HASH = `"$ApiHash`";")
-    [System.IO.File]::WriteAllText($BuildVarsFile, $content, (New-Object System.Text.UTF8Encoding $false))
-    Write-Ok "API patched (id $ApiId)"
+function Read-Edition {
+    Write-Host ''
+    Write-Host '  App edition:' -ForegroundColor Cyan
+    Write-Host '    [1] FemboyGram'
+    Write-Host '    [2] ExteraGram'
+    Write-Host ''
+    do {
+        $choice = (Read-Host '  Choice [1/2]').Trim()
+    } while ($choice -ne '1' -and $choice -ne '2')
+    if ($choice -eq '2') { return 'exteragram' }
+    return 'femboygram'
+}
+
+function Set-ApiCredentials([string]$ApiId, [string]$ApiHash) {
+    if ($ApiId -notmatch '^\d+$') {
+        throw 'FEMBOYGRAM_API_ID must contain digits only.'
+    }
+    if ($ApiHash -notmatch '^[0-9a-fA-F]{32}$') {
+        throw 'FEMBOYGRAM_API_HASH must be a 32-character hexadecimal value.'
+    }
+    $env:FEMBOYGRAM_API_ID = $ApiId
+    $env:FEMBOYGRAM_API_HASH = $ApiHash
+    Write-Ok "API credentials passed to Gradle (id $ApiId)"
 }
 
 function Get-JavaMajorVersion {
@@ -233,24 +255,25 @@ try {
     Write-Host "Repo: $RepoRoot"
     Write-Host 'Tip: run build-android.bat from cmd or PowerShell (not Git Bash).' -ForegroundColor DarkGray
 
-    # --- Build type ---
+    # --- Edition and build type ---
+    if ([string]::IsNullOrWhiteSpace($Edition)) {
+        $Edition = Read-Edition
+    }
     if ([string]::IsNullOrWhiteSpace($BuildType)) {
         $BuildType = Read-BuildType
     }
 
-    # :TMessagesProj_App is the Google Play flavor (ApplicationLoaderImpl.isStandalone()
-    # = false) -- Play Store builds carry restrictions stock Telegram itself doesn't
-    # apply to the direct/telegram.org-style download (e.g. some bot chats refuse to
-    # open). :TMessagesProj_AppStandalone (ApplicationLoaderImpl.isStandalone() = true)
-    # is that unrestricted flavor and shares this repo's same applicationId/keystore, so
-    # it installs as an update over an existing build rather than a second app. It has no
-    # "release" build type -- its signed/optimized type is named "standalone" instead.
+    # The edition dimension gives each app its own package id, while the
+    # standalone build type remains the unrestricted direct-download variant.
     $GradleModule  = ':TMessagesProj_AppStandalone'
     $ApkBuildTypeDir = if ($BuildType -eq 'release') { 'standalone' } else { 'debug' }
-    $BuildTypeCap  = (Get-Culture).TextInfo.ToTitleCase($ApkBuildTypeDir)  # debug->Debug / standalone->Standalone
-    $GradleTask    = "${GradleModule}:assembleAfat$BuildTypeCap"
-    $ApkPath = Join-Path $RepoRoot "TMessagesProj_AppStandalone\build\outputs\apk\afat\$ApkBuildTypeDir\app.apk"
+    $BuildTypeCap  = (Get-Culture).TextInfo.ToTitleCase($ApkBuildTypeDir)
+    $EditionCap = (Get-Culture).TextInfo.ToTitleCase($Edition)
+    $GradleTask = "${GradleModule}:assemble${EditionCap}Afat$BuildTypeCap"
+    $ApkVariantDir = "$Edition" + "Afat"
+    $ApkPath = Join-Path $RepoRoot "TMessagesProj_AppStandalone\build\outputs\apk\$ApkVariantDir\$ApkBuildTypeDir\app.apk"
 
+    Write-Ok "Edition: $Edition"
     Write-Ok "Build type: $BuildType"
 
     # OWPENGRAM_BUILD is the release number this build ships under -- the N in
@@ -284,7 +307,7 @@ try {
     # --- API credentials ---
     $api = Get-ApiCredentials
     Write-Ok "API credentials: $($api.Source) (id $($api.Id))"
-    Patch-Api -ApiId $api.Id -ApiHash $api.Hash
+    Set-ApiCredentials -ApiId $api.Id -ApiHash $api.Hash
 
     # --- Tools check ---
     Write-Step 'Check tools'
@@ -311,15 +334,16 @@ try {
     Write-Ok 'Submodules OK'
 
     Write-Step "Gradle $GradleTask"
-    Invoke-Gradle -Task $GradleTask -Label "assemble-$BuildType"
+    Invoke-Gradle -Task $GradleTask -Label "assemble-$Edition-$BuildType"
 
-    if (Test-Path $ApkPath) {
-        Write-Ok "APK: $ApkPath"
+    if (-not (Test-Path -LiteralPath $ApkPath -PathType Leaf)) {
+        throw "Gradle completed but the expected APK was not created: $ApkPath"
     }
-    else {
-        Write-Host "[WARN] APK not found at: $ApkPath" -ForegroundColor Yellow
-        Write-Host "       Check folder: $(Join-Path $RepoRoot 'TMessagesProj_AppStandalone\build\outputs\apk')" -ForegroundColor Yellow
+    $apkInfo = Get-Item -LiteralPath $ApkPath
+    if ($apkInfo.Length -le 0) {
+        throw "Gradle produced an empty APK file: $ApkPath"
     }
+    Write-Ok "APK: $ApkPath ($($apkInfo.Length) bytes)"
 }
 catch {
     Write-Err $_.Exception.Message

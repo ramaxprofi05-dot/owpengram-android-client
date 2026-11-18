@@ -41,6 +41,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.DataSetObserver;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -253,6 +254,7 @@ import org.telegram.ui.Components.LinkSpanDrawable;
 import org.telegram.ui.Components.MediaActivity;
 import org.telegram.ui.Components.MessagePrivateSeenView;
 import org.telegram.ui.Components.ProfileActionsView;
+import org.telegram.ui.Components.ProfileBannerView;
 import org.telegram.ui.Components.ProfileGalleryBlurView;
 import org.telegram.ui.Components.Paint.PersistColorPalette;
 import org.telegram.ui.Components.Premium.LimitPreviewView;
@@ -327,6 +329,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
@@ -397,6 +400,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     private ProfileBalanceView balanceView;
     private AnimatedStatusView animatedStatusView;
     private AvatarImageView avatarImage;
+    private ProfileBannerView profileBannerView;
+    private static final int REQUEST_PROFILE_BANNER = 4987;
     private View avatarOverlay;
     private AnimatorSet avatarAnimation;
     private RadialProgressView avatarProgressView;
@@ -2432,6 +2437,10 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         }
         if (avatarImage != null) {
             avatarImage.setImageDrawable(null);
+        }
+        if (profileBannerView != null) {
+            profileBannerView.clearImage();
+            profileBannerView = null;
         }
         if (imageUpdater != null) {
             imageUpdater.clear();
@@ -5355,6 +5364,27 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         fallbackImage.setRoundRadius(AndroidUtilities.dp(11));
         AndroidUtilities.updateViewVisibilityAnimated(avatarContainer2, true, 1f, false);
         frameLayout.addView(avatarContainer2, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.START, 0, 0, 0, 0));
+        if (userId != 0 && myProfile) {
+            profileBannerView = new ProfileBannerView(context);
+            profileBannerView.setOnClickListener(v -> openProfileBannerPicker());
+            profileBannerView.setOnLongClickListener(v -> {
+                if (profileBannerView == null || !profileBannerView.hasImage()) {
+                    return false;
+                }
+                showProfileBannerRemoveDialog();
+                return true;
+            });
+            String bannerPath = context.getSharedPreferences("profile_banners", Context.MODE_PRIVATE)
+                    .getString(getProfileBannerPreferenceKey(), null);
+            if (bannerPath != null) {
+                File bannerFile = new File(bannerPath);
+                recoverProfileBannerFile(bannerFile);
+                profileBannerView.setImageFile(bannerFile);
+            }
+            avatarContainer2.addView(profileBannerView, 0, new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT, getHeaderOnlyExtraHeight(), Gravity.TOP | Gravity.LEFT
+            ));
+        }
         avatarContainer.setPivotX(0);
         avatarContainer.setPivotY(0);
         avatarGooey = new ProfileGooeyView(context);
@@ -13010,8 +13040,173 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
+    private String getProfileBannerPreferenceKey() {
+        return "banner_" + currentAccount + "_" + getUserConfig().getClientUserId();
+    }
+
+    private void recoverProfileBannerFile(File destination) {
+        File backup = new File(destination.getParentFile(), destination.getName() + ".bak");
+        if (!backup.exists()) {
+            return;
+        }
+        if (!destination.exists()) {
+            if (!backup.renameTo(destination)) {
+                FileLog.e("Could not restore interrupted profile banner replacement");
+            }
+        } else if (!backup.delete()) {
+            FileLog.e("Could not delete stale profile banner backup");
+        }
+    }
+
+    private void openProfileBannerPicker() {
+        if (!myProfile || getParentActivity() == null) {
+            return;
+        }
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/*");
+        try {
+            startActivityForResult(intent, REQUEST_PROFILE_BANNER);
+        } catch (ActivityNotFoundException e) {
+            FileLog.e(e);
+            Toast.makeText(getParentActivity(), R.string.ProfileBannerPickerUnavailable, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void saveProfileBanner(Uri source) {
+        Activity activity = getParentActivity();
+        if (activity == null || source == null || !myProfile || userId == 0) {
+            return;
+        }
+
+        File directory = new File(activity.getFilesDir(), "profile_banners");
+        File destination = new File(directory,
+                "banner_" + currentAccount + "_" + getUserConfig().getClientUserId() + ".image");
+        File temporary = new File(directory, destination.getName() + ".tmp");
+        File backup = new File(directory, destination.getName() + ".bak");
+        boolean previousMovedToBackup = false;
+        boolean newBannerInstalled = false;
+        try {
+            if (!directory.exists() && !directory.mkdirs()) {
+                throw new IllegalStateException("Could not create profile banner directory");
+            }
+            if (temporary.exists() && !temporary.delete()) {
+                throw new IllegalStateException("Could not clear temporary profile banner");
+            }
+            recoverProfileBannerFile(destination);
+
+            long copied = 0;
+            try (InputStream input = activity.getContentResolver().openInputStream(source);
+                 BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(temporary))) {
+                if (input == null) {
+                    throw new IllegalStateException("Could not open selected image");
+                }
+                byte[] buffer = new byte[16 * 1024];
+                int read;
+                while ((read = input.read(buffer)) != -1) {
+                    copied += read;
+                    if (copied > 15L * 1024L * 1024L) {
+                        throw new IllegalStateException("Profile banner is larger than 15 MB");
+                    }
+                    output.write(buffer, 0, read);
+                }
+                output.flush();
+            }
+
+            if (copied == 0) {
+                throw new IllegalStateException("Selected image is empty");
+            }
+
+            // Validate the actual file, not only the provider's MIME type. This
+            // prevents corrupt/non-image content and extreme dimensions from
+            // replacing a previously working banner.
+            BitmapFactory.Options bounds = new BitmapFactory.Options();
+            bounds.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(temporary.getAbsolutePath(), bounds);
+            long pixels = (long) bounds.outWidth * (long) bounds.outHeight;
+            if (bounds.outWidth <= 0 || bounds.outHeight <= 0
+                    || bounds.outWidth > 12000 || bounds.outHeight > 12000
+                    || pixels > 60_000_000L) {
+                throw new IllegalStateException("Selected file is not a supported image");
+            }
+
+            if (destination.exists()) {
+                if (!destination.renameTo(backup)) {
+                    throw new IllegalStateException("Could not preserve previous profile banner");
+                }
+                previousMovedToBackup = true;
+            }
+            if (!temporary.renameTo(destination)) {
+                throw new IllegalStateException("Could not install selected profile banner");
+            }
+            newBannerInstalled = true;
+
+            activity.getSharedPreferences("profile_banners", Context.MODE_PRIVATE)
+                    .edit()
+                    .putString(getProfileBannerPreferenceKey(), destination.getAbsolutePath())
+                    .apply();
+            if (profileBannerView != null) {
+                profileBannerView.setImageFile(destination);
+            }
+            if (backup.exists() && !backup.delete()) {
+                FileLog.e("Could not delete previous profile banner backup");
+            }
+            Toast.makeText(activity, R.string.ProfileBannerSavedLocally, Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            FileLog.e(e);
+            if (!newBannerInstalled && previousMovedToBackup && backup.exists()) {
+                if (destination.exists() && !destination.delete()) {
+                    FileLog.e("Could not remove incomplete profile banner");
+                }
+                if (!backup.renameTo(destination)) {
+                    FileLog.e("Could not restore previous profile banner");
+                }
+            }
+            Toast.makeText(activity, R.string.ProfileBannerSaveFailed, Toast.LENGTH_SHORT).show();
+        } finally {
+            if (temporary.exists() && !temporary.delete()) {
+                FileLog.e("Could not delete temporary profile banner");
+            }
+            if (newBannerInstalled && backup.exists() && !backup.delete()) {
+                FileLog.e("Could not delete stale profile banner backup");
+            }
+        }
+    }
+
+    private void showProfileBannerRemoveDialog() {
+        Activity activity = getParentActivity();
+        if (activity == null) {
+            return;
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle(LocaleController.getString(R.string.ProfileBannerRemoveTitle));
+        builder.setMessage(LocaleController.getString(R.string.ProfileBannerRemoveMessage));
+        builder.setPositiveButton(LocaleController.getString(R.string.Remove), (dialog, which) -> {
+            SharedPreferences preferences = activity.getSharedPreferences("profile_banners", Context.MODE_PRIVATE);
+            String path = preferences.getString(getProfileBannerPreferenceKey(), null);
+            preferences.edit().remove(getProfileBannerPreferenceKey()).apply();
+            if (path != null) {
+                File bannerFile = new File(path);
+                if (bannerFile.exists() && !bannerFile.delete()) {
+                    FileLog.e("Could not delete local profile banner");
+                }
+            }
+            if (profileBannerView != null) {
+                profileBannerView.clearImage();
+            }
+        });
+        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
+        showDialog(builder.create());
+    }
+
     @Override
     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_PROFILE_BANNER) {
+            if (resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
+                saveProfileBanner(data.getData());
+            }
+            return;
+        }
         if (imageUpdater != null) {
             imageUpdater.onActivityResult(requestCode, resultCode, data);
         }
