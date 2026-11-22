@@ -60,7 +60,7 @@ public class OwpengramServers {
         customServersChangedListeners.remove(listener);
     }
 
-    private static final String DEFAULT_HOST = "152.89.254.50";
+    private static final String DEFAULT_HOST = "95.163.2.31";
     private static final int    DEFAULT_PORT = 2398;
 
     // OwpenGram's own production server RSA key.
@@ -130,11 +130,14 @@ public class OwpengramServers {
 
     public static List<OwpengramServer> listServers() {
         List<OwpengramServer> result = new ArrayList<>();
-        // FemboyGram is a self-hosted network. Do not offer Telegram's public
-        // cloud or OwpenGram's public endpoint as sign-in destinations.
-        // Until the FemboyGram endpoint is provisioned, the user adds the
-        // FemboyGram server through the normal custom-server flow.
-        result.addAll(loadCustomServers());
+        // FemboyGram's self-hosted MTProto endpoint is the default destination.
+        // Keep Telegram's public cloud out of the server picker.
+        result.add(owpengramServer());
+        for (OwpengramServer custom : loadCustomServers()) {
+            if (custom != null && !ID_OWPENGRAM.equals(custom.id)) {
+                result.add(custom);
+            }
+        }
         return result;
     }
 
