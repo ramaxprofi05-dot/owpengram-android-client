@@ -787,7 +787,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
             items.add(SettingCell.Factory.of(23, 0xFFC46EF4, 0xFF9F55DF, R.drawable.settings_features, getString(R.string.TelegramFeatures)));
             items.add(SettingCell.Factory.of(19, 0xFF55CA47, 0xFF27B434, R.drawable.settings_policy, getString(R.string.PrivacyPolicy)));
         }
-        items.add(SettingCell.Factory.of(30, 0xFF6E7B86, 0xFF55606A, R.drawable.github_logo, "OwpenGram"));
+        items.add(SettingCell.Factory.of(30, 0xFF6E7B86, 0xFF55606A, R.drawable.github_logo, "FemboyGram source"));
 
         if (SharedSettings.experimentalSettingsAllowed.get()) {
             items.add(UItem.asShadow(null));
@@ -1009,7 +1009,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
             String versionName = pInfo.versionName;
             // OwpenGram release number from the build script (-POWPENGRAM_BUILD=N);
             // 0 is a local dev build.
-            versionName += BuildVars.OWPENGRAM_BUILD > 0 ? "_O" + BuildVars.OWPENGRAM_BUILD : "_dev";
+            versionName += BuildVars.OWPENGRAM_BUILD > 0 ? "_F" + BuildVars.OWPENGRAM_BUILD : "_dev";
 
             String appName = BuildVars.isExteraGram() ? "ExteraGram" : "FemboyGram";
             return appName + " " + String.format(Locale.US, "v%s (%d)\n%s", versionName, code, abi);
