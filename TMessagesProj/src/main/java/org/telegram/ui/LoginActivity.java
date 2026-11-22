@@ -1273,6 +1273,14 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             }
         }
         builder.setNeutralButton(getString("BotHelp", R.string.BotHelp), (dialog, which) -> {
+            if (!OwpengramServers.serverIsOfficialTelegram(UserConfig.selectedAccount)) {
+                AlertDialog.Builder help = new AlertDialog.Builder(fragment.getParentActivity());
+                help.setTitle(getString(R.string.RestorePasswordNoEmailTitle));
+                help.setMessage("For FemboyGram login help, contact the administrator of your FemboyGram server.");
+                help.setPositiveButton(getString("OK", R.string.OK), null);
+                fragment.showDialog(help.create());
+                return;
+            }
             try {
                 PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
                 String version = String.format(Locale.US, "%s (%d)", pInfo.versionName, pInfo.versionCode);
