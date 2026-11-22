@@ -35,7 +35,7 @@
     <string name="SentSmsCode">We hebben een sms met een activeringscode verzonden naar je telefoon **%1$s**.</string>
     <string name="SentAppCode">We hebben de code naar de **FemboyGram**-app op je andere apparaat verzonden.</string>
     <string name="SentAppCodeWithPhone">We hebben de code naar de **FemboyGram-app** voor %1$s op je andere apparaat gestuurd.</string>
-    <string name="SentAppCodeTitle">Controleer je Telegramberichten</string>
+    <string name="SentAppCodeTitle">Controleer je FemboyGram-berichten</string>
     <string name="SentFragmentCode">Ga naar Anonymous Numbers op Fragment om de code voor %1$s te verkrijgen.</string>
     <string name="SentSmsCodeTitle">Code invoeren</string>
     <string name="OpenFragment">Fragment openen</string>
