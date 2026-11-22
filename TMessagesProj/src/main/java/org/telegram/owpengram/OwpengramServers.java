@@ -132,9 +132,16 @@ public class OwpengramServers {
         List<OwpengramServer> result = new ArrayList<>();
         // FemboyGram's self-hosted MTProto endpoint is the default destination.
         // Keep Telegram's public cloud out of the server picker.
-        result.add(owpengramServer());
+        OwpengramServer primary = owpengramServer();
+        result.add(primary);
         for (OwpengramServer custom : loadCustomServers()) {
-            if (custom != null && !ID_OWPENGRAM.equals(custom.id)) {
+            if (custom == null || ID_OWPENGRAM.equals(custom.id)) {
+                continue;
+            }
+            boolean sameEndpoint = custom.port == primary.port
+                    && !TextUtils.isEmpty(custom.host)
+                    && custom.host.equalsIgnoreCase(primary.host);
+            if (!sameEndpoint) {
                 result.add(custom);
             }
         }
