@@ -59,6 +59,7 @@ jobs:
       - name: Compile FemboyGram application identity
         run: |
           ./gradlew --no-daemon --no-build-cache --stacktrace -PAPP_PACKAGE=com.femboygram.messenger \
+            :TMessagesProj_AppStandalone:processAfatDebugResources \
             :TMessagesProj_AppStandalone:processAfatDebugMainManifest \
             :TMessagesProj_AppStandalone:compileAfatDebugJavaWithJavac
 
