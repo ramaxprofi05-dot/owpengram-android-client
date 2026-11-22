@@ -937,10 +937,13 @@ public class OwpengramServers {
         String description = object.optString("description", "");
         String logoPath = object.optString("logoPath", "");
         if (!TextUtils.isEmpty(name)) {
-            s.name = name;
+            String displayName = name.trim();
+            s.name = displayName.equalsIgnoreCase(s.host) || isIpAddress(displayName)
+                    ? "FemboyGram"
+                    : displayName.replaceAll("(?i)OwpenGram|ExteraGram", "FemboyGram");
         }
         if (!TextUtils.isEmpty(description)) {
-            s.description = description;
+            s.description = description.replaceAll("(?i)OwpenGram|ExteraGram", "FemboyGram");
         }
         if (!TextUtils.isEmpty(logoPath)) {
             s.logoPath = logoPath;
