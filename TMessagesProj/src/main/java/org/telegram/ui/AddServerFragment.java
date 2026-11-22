@@ -396,6 +396,11 @@ public class AddServerFragment extends BaseFragment {
         String address = addressField.getText().toString().trim();
         String[] parts = parseAddress(address);
         String host = parts[0];
+        if (!name.isEmpty()) {
+            name = name.equalsIgnoreCase(host) || isIpAddress(name)
+                    ? "FemboyGram"
+                    : name.replaceAll("(?i)OwpenGram|ExteraGram", "FemboyGram");
+        }
 
         if (name.isEmpty()) {
             showFieldError(nameField, "Enter a name");
