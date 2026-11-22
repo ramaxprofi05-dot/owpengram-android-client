@@ -50,11 +50,14 @@ public class OwpengramServer {
         s.port = obj.getInt("port");
         // Older saved entries may have accidentally used the endpoint as
         // the display name. Keep the address only in the connection field.
-        if (s.name != null && (s.name.trim().equalsIgnoreCase(s.host)
-                || isIpAddress(s.name.trim()))) {
-            s.name = "FemboyGram";
+        if (s.name != null) {
+            String displayName = s.name.trim();
+            s.name = displayName.equalsIgnoreCase(s.host) || isIpAddress(displayName)
+                    ? "FemboyGram"
+                    : displayName.replaceAll("(?i)OwpenGram|ExteraGram", "FemboyGram");
         }
-        s.description = obj.optString("description", "");
+        s.description = obj.optString("description", "")
+                .replaceAll("(?i)OwpenGram|ExteraGram", "FemboyGram");
         s.rsaPublicKey = obj.optString("rsaPublicKey", "");
         s.logoPath = obj.optString("logoPath", "");
         s.isOfficial = false;
