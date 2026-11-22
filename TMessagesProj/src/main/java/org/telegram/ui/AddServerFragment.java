@@ -237,6 +237,14 @@ public class AddServerFragment extends BaseFragment {
 
     // --- Address parsing + auto-fetch ---
 
+    private static boolean isIpAddress(String value) {
+        if (value == null || value.isEmpty()) return false;
+        if (value.indexOf(':') >= 0) {
+            return value.matches("[0-9a-fA-F:.%]+");
+        }
+        return value.matches("(?:[0-9]{1,3}\\.){3}[0-9]{1,3}");
+    }
+
     /** Splits "host:port" on the last colon. port is 0 when absent/invalid. */
     private static String[] parseAddress(String address) {
         int colon = address.lastIndexOf(':');
@@ -291,7 +299,13 @@ public class AddServerFragment extends BaseFragment {
                 mainDcField.setText(String.valueOf(result.dcId));
             }
             if (result.name != null && !result.name.isEmpty()) {
-                nameField.setText(result.name);
+                // A backend may accidentally return its raw endpoint as its
+                // display name. Never copy an IP/host into the visible Name field.
+                String displayName = result.name.trim();
+                if (displayName.equalsIgnoreCase(host) || isIpAddress(displayName)) {
+                    displayName = "FemboyGram";
+                }
+                nameField.setText(displayName);
             }
             if (result.description != null && !result.description.isEmpty()) {
                 descField.setText(result.description);
