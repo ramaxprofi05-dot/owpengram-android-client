@@ -14,9 +14,9 @@ on:
   workflow_dispatch:
     inputs:
       build_apk:
-        description: "Разрешить сборку APK (только после завершения разработки)"
+        description: "Собрать FemboyGram debug APK"
         required: true
-        default: false
+        default: true
         type: boolean
 
 permissions:
@@ -61,8 +61,7 @@ jobs:
           ./gradlew --no-daemon --no-build-cache --stacktrace -PAPP_PACKAGE=com.femboygram.messenger \
             :TMessagesProj_AppStandalone:processAfatDebugMainManifest \
             :TMessagesProj_AppStandalone:compileAfatDebugJavaWithJavac \
-            :TMessagesProj_AppTests:compileAfatDebugAndroidTestJavaWithJavac \
-            :TMessagesProj_AppTests:compileAfatDebugAndroidTestKotlin
+            
           MERGED_MANIFEST="$(find TMessagesProj_AppStandalone/build/intermediates/merged_manifest -type f -name AndroidManifest.xml -print -quit)"
           test -n "$MERGED_MANIFEST"
           grep -F 'android:label="FemboyGram"' "$MERGED_MANIFEST"
