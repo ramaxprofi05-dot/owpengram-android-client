@@ -40,7 +40,7 @@ public class OwpengramServers {
     public static final String ID_OWPENGRAM = "owpengram";
     public static final String ID_TELEGRAM  = "telegram";
 
-    /** Public repository of the OwpenGram server, opened from the settings entry. */
+    /** Public source repository for the FemboyGram-compatible server backend. */
     public static final String SERVER_REPO_URL = "https://github.com/ramaxprofi05-dot/owpengram-server";
 
     // Fired whenever the stored custom-server list changes (add/update/remove,
@@ -93,8 +93,8 @@ public class OwpengramServers {
     public static OwpengramServer owpengramServer() {
         OwpengramServer s = new OwpengramServer();
         s.id                 = ID_OWPENGRAM;
-        s.name               = "OwpenGram";
-        s.description        = "This is a test OwpenGram server.";
+        s.name               = "FemboyGram";
+        s.description        = "Official FemboyGram messaging server.";
         s.host               = DEFAULT_HOST;
         s.port               = DEFAULT_PORT;
         s.isOfficial         = true;
