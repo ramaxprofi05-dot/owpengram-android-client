@@ -581,13 +581,7 @@ public class ServerSelectFragment extends BaseFragment {
             nameTv.setEllipsize(TextUtils.TruncateAt.END);
             textCol.addView(nameTv, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
 
-            endpointTv = new TextView(context);
-            endpointTv.setTextSize(13);
-            endpointTv.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));
-            endpointTv.setSingleLine();
-            endpointTv.setEllipsize(TextUtils.TruncateAt.MIDDLE);
-            textCol.addView(endpointTv, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 2, 0, 0));
-
+            // Do not expose the raw host/IP in the server picker.
             // Status line: a coloured dot + status text.
             LinearLayout statusRow = new LinearLayout(context);
             statusRow.setOrientation(LinearLayout.HORIZONTAL);
@@ -640,7 +634,6 @@ public class ServerSelectFragment extends BaseFragment {
                     android.graphics.Shader.TileMode.CLAMP));
 
             nameTv.setText(server.name);
-            endpointTv.setText(server.host + ":" + server.port);
 
             stopPulse();
             int dotColor;
