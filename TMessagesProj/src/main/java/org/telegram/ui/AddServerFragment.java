@@ -304,11 +304,13 @@ public class AddServerFragment extends BaseFragment {
                 String displayName = result.name.trim();
                 if (displayName.equalsIgnoreCase(host) || isIpAddress(displayName)) {
                     displayName = "FemboyGram";
+                } else {
+                    displayName = displayName.replaceAll("(?i)OwpenGram|ExteraGram", "FemboyGram");
                 }
                 nameField.setText(displayName);
             }
             if (result.description != null && !result.description.isEmpty()) {
-                descField.setText(result.description);
+                descField.setText(result.description.replaceAll("(?i)OwpenGram|ExteraGram", "FemboyGram"));
             }
             if (result.hasIcon) {
                 currentIconFetch = OwpengramServers.fetchServerIcon(host, port, bitmap -> {
