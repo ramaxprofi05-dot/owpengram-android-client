@@ -55,9 +55,7 @@ jobs:
           yes | "$SDKMANAGER" --licenses
           "$SDKMANAGER" --install "platforms;android-36" "build-tools;36.0.0" "ndk;27.2.12479018" "cmake;3.22.1"
 
-      # The editions share the native OwpenGram source tree, but must each be
-      # configured and compiled with their own application identity. This is
-      # intentionally compile-only: no APK is packaged before release approval.
+      # Compile only the FemboyGram edition; ExteraGram is not distributed by this project.
       - name: Compile FemboyGram application identity
         run: |
           ./gradlew --no-daemon --no-build-cache --stacktrace -PAPP_PACKAGE=com.femboygram.messenger \
@@ -68,27 +66,12 @@ jobs:
           MERGED_MANIFEST="$(find TMessagesProj_AppStandalone/build/intermediates/merged_manifest -type f -name AndroidManifest.xml -print -quit)"
           test -n "$MERGED_MANIFEST"
           grep -F 'android:label="FemboyGram"' "$MERGED_MANIFEST"
-          grep -F 'android:icon="@mipmap/ic_launcher"' "$MERGED_MANIFEST"
-          grep -F 'android:roundIcon="@mipmap/ic_launcher_round"' "$MERGED_MANIFEST"
+          grep -F 'android:icon="@drawable/femboygram_launcher"' "$MERGED_MANIFEST"
+          grep -F 'android:roundIcon="@drawable/femboygram_launcher"' "$MERGED_MANIFEST"
           BUILD_CONFIG="$(find TMessagesProj/build/generated/source/buildConfig -type f -name BuildConfig.java -print -quit)"
           test -n "$BUILD_CONFIG"
           grep -F 'APP_EDITION = "femboy"' "$BUILD_CONFIG"
 
-      - name: Compile ExteraGram application identity
-        run: |
-          ./gradlew --no-daemon --no-build-cache --stacktrace -PAPP_PACKAGE=com.exteragram.messenger \
-            :TMessagesProj_AppStandalone:processAfatDebugMainManifest \
-            :TMessagesProj_AppStandalone:compileAfatDebugJavaWithJavac \
-            :TMessagesProj_AppTests:compileAfatDebugAndroidTestJavaWithJavac \
-            :TMessagesProj_AppTests:compileAfatDebugAndroidTestKotlin
-          MERGED_MANIFEST="$(find TMessagesProj_AppStandalone/build/intermediates/merged_manifest -type f -name AndroidManifest.xml -print -quit)"
-          test -n "$MERGED_MANIFEST"
-          grep -F 'android:label="ExteraGram"' "$MERGED_MANIFEST"
-          grep -F 'android:icon="@mipmap/ic_launcher_extera"' "$MERGED_MANIFEST"
-          grep -F 'android:roundIcon="@mipmap/ic_launcher_extera"' "$MERGED_MANIFEST"
-          BUILD_CONFIG="$(find TMessagesProj/build/generated/source/buildConfig -type f -name BuildConfig.java -print -quit)"
-          test -n "$BUILD_CONFIG"
-          grep -F 'APP_EDITION = "extera"' "$BUILD_CONFIG"
 
   build:
     needs: verify
@@ -136,27 +119,15 @@ jobs:
             grep -F "package: name='com.femboygram.messenger'"
           cp "$APK" dist/FemboyGram-debug.apk
 
-      - name: Assemble and verify ExteraGram APK
-        run: |
-          ./gradlew --no-daemon --stacktrace -PAPP_PACKAGE=com.exteragram.messenger \
-            :TMessagesProj_AppStandalone:assembleAfatDebug
-          APK="TMessagesProj_AppStandalone/build/outputs/apk/afat/debug/app.apk"
-          test -s "$APK"
-          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging "$APK" | \
-            grep -F "package: name='com.exteragram.messenger'"
-          cp "$APK" dist/ExteraGram-debug.apk
-
       - name: Verify staged APK artifacts
         run: |
           test -s dist/FemboyGram-debug.apk
-          test -s dist/ExteraGram-debug.apk
-          test "$(sha256sum dist/FemboyGram-debug.apk | cut -d' ' -f1)" != \
-               "$(sha256sum dist/ExteraGram-debug.apk | cut -d' ' -f1)"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt" dump badging dist/FemboyGram-debug.apk | grep -F "application-label:'FemboyGram'"
 
-      - name: Upload both APKs
+      - name: Upload FemboyGram APK
         uses: actions/upload-artifact@v4
         with:
-          name: femboygram-and-exteragram-debug
+          name: FemboyGram-Android-debug
           path: dist/*.apk
           if-no-files-found: error
           retention-days: 14
