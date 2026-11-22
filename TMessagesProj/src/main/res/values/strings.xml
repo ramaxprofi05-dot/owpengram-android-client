@@ -2477,11 +2477,11 @@
     <string name="LanguageUnsupportedError">There is no such language.</string>
     <string name="LanguageSame">You are already using this language pack (**%1$s**). You can change your language at any time in Settings.</string>
     <string name="LanguageUnknownCustomAlert">Unfortunately, this custom language pack (**%1$s**) doesn\'t contain data for FemboyGram Android.</string>
-    <string name="AskAQuestionInfo">Please note that FemboyGram Support is done by volunteers. We try to respond as quickly as possible, but it may take a while.\n\nPlease take a look at the <![CDATA[<a href=\"https://telegram.org/faq#general-questions\">Telegram FAQ</a>]]>: it has answers to most questions and important tips for <![CDATA[<a href=\"https://telegram.org/faq#troubleshooting\">troubleshooting</a>]]>.</string>
+    <string name="AskAQuestionInfo">Please note that FemboyGram Support is done by volunteers. We try to respond as quickly as possible, but it may take a while.\n\nPlease take a look at the <![CDATA[<a href=\"https://telegram.org/faq#general-questions\">FemboyGram FAQ</a>]]>: it has answers to most questions and important tips for <![CDATA[<a href=\"https://telegram.org/faq#troubleshooting\">troubleshooting</a>]]>.</string>
     <string name="AskButton">Ask a volunteer</string>
-    <string name="TelegramFAQ">Telegram FAQ</string>
-    <string name="TelegramFaq">Telegram FAQ</string>
-    <string name="TelegramFeatures">Telegram Features</string>
+    <string name="TelegramFAQ">FemboyGram FAQ</string>
+    <string name="TelegramFaq">FemboyGram FAQ</string>
+    <string name="TelegramFeatures">FemboyGram Features</string>
     <string name="TelegramFeaturesUrl">https://t.me/FemboyGramTips</string>
     <string name="AddAccount">Add Account</string>
     <string name="SwitchAccountHint">"Long tap to switch accounts"</string>
@@ -8763,7 +8763,7 @@
     <string name="StoryEditCoverInfo">Choose a frame from the story to show in your Profile.</string>
     <string name="StoryEditCoverMenu">Edit Cover</string>
     <string name="StoryCoverSave">Save Cover</string>
-    <string name="ProfileUnofficialSecurityRisk">%s uses an unofficial Telegram client — messages to this user may be less secure.</string>
+    <string name="ProfileUnofficialSecurityRisk">%s uses an unofficial FemboyGram client — messages to this user may be less secure.</string>
     <string name="WebBookmarks">Bookmarks</string>
     <string name="WebHistory">History</string>
     <string name="WebNoHistory">No history yet</string>
@@ -9571,13 +9571,13 @@
     <string name="Gift2TransferToMyProfile">Transfer to My Profile</string>
     <string name="Gift2AddToProfile">Add to Profile</string>
     <string name="Gift2RemoveFromProfile">Remove from Profile</string>
-    <string name="Gift2TransferToMyProfileText">Do you want to transfer **%s** from your wallet to your Telegram profile?</string>
+    <string name="Gift2TransferToMyProfileText">Do you want to transfer **%s** from your wallet to your FemboyGram profile?</string>
     <string name="Gift2MoveToMyWallet">Move to My Wallet</string>
     <string name="Gift2MoveToMyWalletText">Transfer this gift to your blockchain wallet?</string>
     <string name="Gift2MoveAppearIn">It will appear in</string>
     <string name="Gift2KeepOnProfile">Keep showing on my profile</string>
     <string name="Gift2MoveToMyGifts">Move to My Gifts</string>
-    <string name="Gift2MoveToMyGiftsText">Transfer this collectible off-chain to your Telegram account?</string>
+    <string name="Gift2MoveToMyGiftsText">Transfer this collectible off-chain to your FemboyGram account?</string>
     <string name="Gift2MoveToMyGiftsInfo">You can move it back onchain again at any time.</string>
     <string name="Gift2Move">Move</string>
     <string name="Gift2ShowOnProfile">Show on Profile</string>
@@ -11047,7 +11047,7 @@
 
     <string name="GuestBotFor"> for </string>
 
-    <string name="WearAuthTitle">Use Telegram with WearOS</string>
+    <string name="WearAuthTitle">Use FemboyGram with WearOS</string>
     <string name="WearAuthText">Connect your account to WatchOS device\nto use it separately from your watch.</string>
     <string name="WearAuthEmojis">Compare emojis on your watch</string>
     <string name="WearAuthEmojisLogIn">Log In</string>
@@ -11300,9 +11300,9 @@
     <string name="GiftMessageAddDescription">You can add a message for **%1$s** or send **%2$s** right away.</string>
 
     <string name="UnsupportedBlockTitle">Unsupported Block</string>
-    <string name="UnsupportedBlockMessage">Update Telegram to view this part of the message</string>
+    <string name="UnsupportedBlockMessage">Update FemboyGram to view this part of the message</string>
     <string name="UnsupportedMessageTitle">Unsupported Message</string>
-    <string name="UnsupportedMessageMessage">Update Telegram to view this message</string>
+    <string name="UnsupportedMessageMessage">Update FemboyGram to view this message</string>
     <string name="UnsupportedUpdate">Update</string>
 
     <string name="RoundVideoSettings">Round Video</string>
@@ -11318,7 +11318,7 @@
     <string name="RoundVideoGeneralInfo">60 FPS is used only when both front and rear cameras support it. Otherwise recording falls back to 30 FPS.</string>
     <string name="RoundVideoComposition">Composition</string>
     <string name="RoundVideoCompositionEnabled">Round video styling</string>
-    <string name="RoundVideoCompositionInfo">Disable styling to record a plain square without outside-circle blur, dimming or Telegram overlays.</string>
+    <string name="RoundVideoCompositionInfo">Disable styling to record a plain square without outside-circle blur, dimming or FemboyGram overlays.</string>
 
     <string name="AudioRecorderSettings">Voice Messages</string>
     <string name="AudioRecorderGeneral">Recorder</string>
@@ -11353,7 +11353,7 @@
     <string name="WalletSendGrams">Send Grams</string>
     <string name="WalletInsufficientFunds">Insufficient Funds.</string>
     <string name="WalletTitle">Wallet</string>
-    <string name="WalletAuthorizeTransactionPasscode">Enter your current Telegram passcode to authorize transaction.</string>
+    <string name="WalletAuthorizeTransactionPasscode">Enter your current FemboyGram passcode to authorize transaction.</string>
     <string name="WalletConfirmWithFingerprint">Confirm with Fingerprint</string>
     <string name="WalletConfirmWithPasscode">Confirm with Passcode</string>
     <string name="WalletLock">Lock Wallet</string>
@@ -11390,7 +11390,7 @@
     <string name="WalletOutgoingTransfer">Outgoing transfer</string>
     <string name="WalletIncomingTransferNft">Incoming collectible</string>
     <string name="WalletOutgoingTransferNft">Outgoing collectible</string>
-    <string name="WalletTransactionTelegram">Telegram</string>
+    <string name="WalletTransactionTelegram">FemboyGram</string>
     <string name="WalletMovedFromProfile">moved from profile</string>
     <string name="WalletMovedToProfile">moved to profile</string>
     <string name="WalletTransferStatusFailed">failed</string>
@@ -11424,7 +11424,7 @@
     <string name="WalletFirstGramsSendInfo">Transfer Grams to anyone.\nTap 📎 → Money in chats.</string>
     <string name="WalletTrade">Trade</string>
     <string name="WalletFirstGramsTradeInfo">Convert Grams to cash or crypto on exchanges.</string>
-    <string name="WalletFirstGramsStoreInfo">Keep your Grams in Telegram\n(💬 → ⋮ → Wallet) or other wallets.</string>
+    <string name="WalletFirstGramsStoreInfo">Keep your Grams in FemboyGram\n(💬 → ⋮ → Wallet) or other wallets.</string>
     <string name="WalletStore">Store</string>
     <string name="WalletSell">Sell</string>
     <string name="WalletOptionalComment">Optional comment</string>
@@ -11437,7 +11437,7 @@
     <string name="WalletAddress">Address</string>
     <string name="WalletGramWalletAddress">Gram Wallet</string>
     <string name="WalletAddressCopiedBulletin">Address copied.</string>
-    <string name="WalletFeePaidByTelegram">Free (paid by Telegram)</string>
+    <string name="WalletFeePaidByTelegram">Free (paid by FemboyGram)</string>
     <string name="WalletFee">Fee</string>
     <string name="WalletNetworkFee">Network fee</string>
     <string name="WalletDate">Date</string>
@@ -11450,10 +11450,10 @@
     <string name="WalletSecretPhrase">Secret Phrase</string>
     <string name="WalletImport">Import Wallet</string>
     <string name="WalletEnterSecretPhrase">Enter your wallet\'s Secret Phrase\nto continue. **Why?**</string>
-    <string name="WalletEnterSecretPhraseInfo">Since you disabled backups for your wallet, you have to manually enter your Secret Phrase in every new Telegram session.</string>
+    <string name="WalletEnterSecretPhraseInfo">Since you disabled backups for your wallet, you have to manually enter your Secret Phrase in every new FemboyGram session.</string>
     <string name="WalletImportButton">Import</string>
     <string name="WalletInvalidRecoveryPhrase">Invalid Recovery Phrase</string>
-    <string name="WalletInvalidRecoveryPhraseInfo">Check the word order.\n\nOnly a recovery phrase created in Telegram can be imported here.</string>
+    <string name="WalletInvalidRecoveryPhraseInfo">Check the word order.\n\nOnly a recovery phrase created in FemboyGram can be imported here.</string>
     <string name="WalletWrongSecretPhrase">Wrong Secret Phrase</string>
     <string name="WalletWrongSecretPhraseInfo">The words you entered don\'t match the wallet.</string>
     <string name="WalletImported">Wallet Imported</string>
@@ -11461,16 +11461,16 @@
     <string name="WalletRecoveryPhraseTransferInfo">You can transfer your wallet to another device by copying your 12-word recovery phrase.</string>
     <string name="WalletEncryptedBackup">Encrypted Backup</string>
     <string name="WalletDisableBackup">Disable Backup</string>
-    <string name="WalletBackupEnabledDescription">Your encrypted key backup is split into three parts and stored across three continents.\n\nIt can only be reassembled on your devices, so no one — not even Telegram — can access your key.</string>
+    <string name="WalletBackupEnabledDescription">Your encrypted key backup is split into three parts and stored across three continents.\n\nIt can only be reassembled on your devices, so no one — not even FemboyGram — can access your key.</string>
     <string name="WalletEnableBackup">Enable Backup</string>
-    <string name="WalletBackupDisabledDescription">Your encrypted key backup will be split into three parts and stored across three continents.\n\nIt can only be reassembled on your devices, so no one — not even Telegram — can access your key.</string>
+    <string name="WalletBackupDisabledDescription">Your encrypted key backup will be split into three parts and stored across three continents.\n\nIt can only be reassembled on your devices, so no one — not even FemboyGram — can access your key.</string>
     <string name="WalletDeleteWallet">Delete Wallet</string>
     <string name="WalletPreviousWallets">Previous wallets</string>
     <string name="WalletPreviousWalletsInfo">Wallets you used before on this device. Save their secret phrases — they\'ll be removed if you log out or reinstall the app.</string>
     <string name="WalletRecoveryPhraseLearnInfo">Your Secret Recovery Phrase is the key to back up your wallet. Keep it secret and secure at all times.</string>
     <string name="WalletRecoveryPhraseNeverShare">**Never share **your secret Recovery Phrase with anyone.</string>
     <string name="WalletRecoveryPhraseFundsWarning">If someone has your Recovery Phrase they **can steal your funds**.</string>
-    <string name="WalletRecoveryPhraseSupportWarning">Telegram Support **will never ask you** for your Recovery Phrase.</string>
+    <string name="WalletRecoveryPhraseSupportWarning">FemboyGram Support **will never ask you** for your Recovery Phrase.</string>
     <string name="WalletYourRecoveryPhrase">Your Recovery Phrase</string>
     <string name="WalletRecoveryPhraseInfo">Your Secret Recovery Phrase is the key to back up your wallet. Keep it secret and secure at all times.</string>
     <string name="WalletImportThisWallet">Import This Wallet</string>
@@ -11486,7 +11486,7 @@
     <string name="WalletTopUp">Top up</string>
     <string name="WalletDisableBackupConfirmInfo">Your distributed encrypted backup will be deleted. Your wallet will switch to the new secret phrase. This secret phrase will be the only way to recover this wallet.</string>
     <string name="WalletBackupEnabled">Backup Enabled</string>
-    <string name="WalletBackupEnabledInfo">Your keys are now stored encrypted across Telegram\'s datacenters.</string>
+    <string name="WalletBackupEnabledInfo">Your keys are now stored encrypted across FemboyGram\'s datacenters.</string>
     <string name="WalletSaveOnDevice">Save current wallet on this device</string>
     <string name="WalletDeleteAnyway">Delete anyway</string>
     <string name="WalletReplaceWalletTitle">How do you want to replace the old wallet?</string>
@@ -11530,7 +11530,7 @@
     <string name="WalletFeeAmount">Fee: %1$s</string>
     <string name="WalletFeeAmountWithCurrency">Fee: %1$s (~%2$s).</string>
     <string name="WalletFirstGramsRate">%1$s currently equals %2$s USD.\nYou can:</string>
-    <string name="WalletNetworkFeeInfo">Every transfer costs a small network fee (**~%1$s**). Telegram covers your first **5** transfers each day.</string>
+    <string name="WalletNetworkFeeInfo">Every transfer costs a small network fee (**~%1$s**). FemboyGram covers your first **5** transfers each day.</string>
     <string name="WalletHiddenTransactions">Transactions under %1$s are hidden.</string>
     <string name="WalletOldWalletsBalance">You also have %1$s in old wallets</string>
     <string name="WalletGramEarningsBalance">You also have %1$s in Gram Earnings</string>
@@ -11576,7 +11576,7 @@
     <string name="WalletCollectibleTransferPrepareFailed">Unable to prepare collectible transfer</string>
     <string name="WalletSearchNoResults">There were no results for \"%1$s\".\nTry another name or address.</string>
     <string name="WalletUserWallet">%1$s\'s wallet</string>
-    <string name="WalletAddressLinkedToUser">This TON Blockchain address is linked to **%1$s** on Telegram.</string>
+    <string name="WalletAddressLinkedToUser">This TON Blockchain address is linked to **%1$s** on FemboyGram.</string>
     <string name="WalletAddressNoLinkedAccount">This address has no linked\nTelegram account.</string>
     <string name="WalletTapToSetAmount">Tap to set amount</string>
     <string name="WalletTonConnectRequestUnavailable">This TON Connect request is unavailable or has already been answered</string>
