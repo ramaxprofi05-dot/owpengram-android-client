@@ -3999,7 +3999,7 @@
     <string name="InvalidLastName">Sorry, this last name can\'t be used</string>
     <string name="Loading">Loading...</string>
     <string name="NoPlayerInstalled">You don\'t have a video player, please install one to continue</string>
-    <string name="NoMailInstalled">Please send an email describing your problem to sms@telegram.org</string>
+    <string name="NoMailInstalled">Please install an email app to send this message.</string>
     <string name="NoHandleAppInstalled">You don\'t have applications that can handle the file type \'%1$s\', please install one to continue</string>
     <string name="InviteUser">This user does not have FemboyGram yet, send an invitation?</string>
     <string name="AreYouSure">Are you sure?</string>
