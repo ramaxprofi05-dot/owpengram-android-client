@@ -18,10 +18,6 @@ bound to its selected server, so identities and data remain separated.
 > Built on **MTProto API layer 232**, using the Telegram for Android
 > `v13.1.1` codebase as its protocol-compatible foundation.
 
-<p align="center">
-  <img src="media/readme/android_hero.png" alt="FemboyGram for Android — chats and calls" width="820">
-</p>
-
 ---
 
 ## 📥 Download
