@@ -763,9 +763,14 @@ public class OwpengramServers {
             String logoPath,
             boolean hasIcon) {
         // The server endpoint is connection data, never its public display name.
-        if (!TextUtils.isEmpty(name)
-                && (name.trim().equalsIgnoreCase(server.host) || isIpAddress(name.trim()))) {
-            name = "FemboyGram";
+        if (!TextUtils.isEmpty(name)) {
+            String displayName = name.trim();
+            name = displayName.equalsIgnoreCase(server.host) || isIpAddress(displayName)
+                    ? "FemboyGram"
+                    : displayName.replaceAll("(?i)OwpenGram|ExteraGram", "FemboyGram");
+        }
+        if (!TextUtils.isEmpty(description)) {
+            description = description.replaceAll("(?i)OwpenGram|ExteraGram", "FemboyGram");
         }
         String supersededLogo = null;
         boolean changed = false;
