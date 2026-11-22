@@ -60,8 +60,8 @@ jobs:
         run: |
           ./gradlew --no-daemon --no-build-cache --stacktrace -PAPP_PACKAGE=com.femboygram.messenger \
             :TMessagesProj_AppStandalone:processAfatDebugMainManifest \
-            :TMessagesProj_AppStandalone:compileAfatDebugJavaWithJavac \
-            
+            :TMessagesProj_AppStandalone:compileAfatDebugJavaWithJavac
+
           MERGED_MANIFEST="$(find TMessagesProj_AppStandalone/build/intermediates/merged_manifest -type f -name AndroidManifest.xml -print -quit)"
           test -n "$MERGED_MANIFEST"
           grep -F 'android:label="FemboyGram"' "$MERGED_MANIFEST"
