@@ -535,7 +535,6 @@ public class ServerSelectFragment extends BaseFragment {
         private android.graphics.Bitmap logoBitmap;
 
         private final TextView nameTv;
-        private final TextView endpointTv;
         private final TextView statusTv;
         private final View statusDot;
         private final TextView joinBtn;
