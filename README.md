@@ -95,7 +95,7 @@ anything. Only those cosmetics — host, port, key and DC id are never touched
 after you've saved them.
 
 Don't have a server yet? Spin one up in one command:
-👉 [owpengram-server](https://github.com/owpengram/owpengram-server)
+👉 [FemboyGram server source](https://github.com/ramaxprofi05-dot/owpengram-server)
 
 ## 🛠️ Build (Windows)
 
@@ -120,18 +120,11 @@ build that never checks for updates. For scripted builds set the
 36.0.0, NDK 27.2.12479018), Git. Minimum supported device API is 23
 (Android 6.0).
 
-## 📦 Part of the OwpenGram project
+## 📦 Related source
 
-- 🚀 [Server](https://github.com/owpengram/owpengram-server)
-- 💻 [Desktop client](https://github.com/owpengram/owpengram-desktop-client)
-- 🌐 [Web client](https://github.com/owpengram/owpengram-web-client)
-- 🎁 [Gift packs](https://github.com/owpengram/owpengram-giftpacks)
-- 🏢 [GitHub organization](https://github.com/owpengram)
+- 🚀 [FemboyGram-compatible server source](https://github.com/ramaxprofi05-dot/owpengram-server)
 
-## 💬 Community
-
-- 📢 Channel: [@owpengram](https://t.me/owpengram)
-- 💬 Chat: [Join the discussion](https://t.me/+sVB6Ymv70jEwNTAy)
+Community links and additional clients will be published here when the FemboyGram channels are ready.
 
 ## 📄 License
 
@@ -140,9 +133,9 @@ under **GNU GPL v2 or later** ([LICENSE](LICENSE)).
 
 ---
 
-⭐ If OwpenGram is useful to you, a star on GitHub helps a lot.
+⭐ If FemboyGram is useful to you, a star on GitHub helps a lot.
 
 
 ## FemboyGram fork: API credentials
 
-The FemboyGram fork deliberately does not reuse OwpenGram's Telegram API credentials, Google client IDs, SafetyNet key, store links, or release updater. Create an application at https://my.telegram.org/apps and configure the repository Actions secrets `FEMBOYGRAM_API_ID` and `FEMBOYGRAM_API_HASH`. The Android build compiles with an empty credential fallback for CI, but authentication is not expected to work until the FemboyGram credentials are supplied. Passkeys and store billing remain disabled until FemboyGram has its own verified app integrations.
+The FemboyGram build deliberately does not reuse upstream Telegram API credentials, Google client IDs, SafetyNet keys, store links, or release updater. Create an application at https://my.telegram.org/apps and configure the repository Actions secrets `FEMBOYGRAM_API_ID` and `FEMBOYGRAM_API_HASH`. The Android build compiles with an empty credential fallback for CI, but authentication is not expected to work until the FemboyGram credentials are supplied. Passkeys and store billing remain disabled until FemboyGram has its own verified app integrations.
