@@ -4018,7 +4018,7 @@
     <string name="SendGameToText">Do you want to share this game to **%1$s**?</string>
     <string name="SendContactToText">Do you want to send this contact to **%1$s**?</string>
     <string name="AreYouSureLogout">Are you sure you want to log out?\n\nNote that you can seamlessly use FemboyGram on all your devices at once.\n\nRemember, logging out kills all your Secret Chats.</string>
-    <string name="AreYouSureLogoutGrams">Are you sure you want to log out?\n\nThis will cancel all your Secret Chats and **delete wallet backups holding %s**. Without their recovery phrases, you\'ll lose access to these funds.\n\nYou can use Telegram on all your devices at once and use several accounts in the same app.</string>
+    <string name="AreYouSureLogoutGrams">Are you sure you want to log out?\n\nThis will cancel all your Secret Chats and **delete wallet backups holding %s**. Without their recovery phrases, you\'ll lose access to these funds.\n\nYou can use FemboyGram on all your devices at once and use several accounts in the same app.</string>
     <string name="DeleteFewChatsTitle">Delete %1$s</string>
     <string name="ClearFewChatsTitle">Clear %1$s</string>
     <string name="ClearCacheFewChatsTitle">Empty cache for %1$s</string>
