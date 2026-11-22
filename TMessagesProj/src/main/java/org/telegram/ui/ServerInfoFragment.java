@@ -180,14 +180,8 @@ public class ServerInfoFragment extends BaseFragment {
         nameTv.setPadding(0, dp(10), 0, dp(2));
         hero.addView(nameTv);
 
-        // Endpoint
-        TextView epTv = new TextView(context);
-        epTv.setText(server.host + ":" + server.port);
-        epTv.setTextSize(12);
-        epTv.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));
-        epTv.setGravity(Gravity.CENTER);
-        hero.addView(epTv);
-
+        // Keep the raw host/IP out of the user-facing server profile.
+        // The endpoint remains stored internally for network connections.
         // Badges
         LinearLayout badges = new LinearLayout(context);
         badges.setOrientation(LinearLayout.HORIZONTAL);
