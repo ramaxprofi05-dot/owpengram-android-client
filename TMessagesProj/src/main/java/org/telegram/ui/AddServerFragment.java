@@ -168,7 +168,7 @@ public class AddServerFragment extends BaseFragment {
         content.addView(advancedHeader);
         LinearLayout section3 = buildCard(context);
         multiDcToggle = buildToggleRow(context, "Multi-DC mode",
-                "Only for Telegram-compatible servers", false);
+                "Only for MTProto-compatible servers", false);
         section3.addView(multiDcToggle);
 
         // Main DC selector — single-server only. Hidden when Multi-DC is on
