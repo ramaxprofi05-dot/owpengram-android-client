@@ -36,12 +36,24 @@ public class OwpengramServer {
         return obj;
     }
 
+    private static boolean isIpAddress(String value) {
+        if (value == null || value.isEmpty()) return false;
+        if (value.indexOf(':') >= 0) return value.matches("[0-9a-fA-F:.%]+");
+        return value.matches("(?:[0-9]{1,3}\\.){3}[0-9]{1,3}");
+    }
+
     public static OwpengramServer fromJson(JSONObject obj) throws JSONException {
         OwpengramServer s = new OwpengramServer();
         s.id = obj.getString("id");
         s.name = obj.getString("name");
         s.host = obj.getString("host");
         s.port = obj.getInt("port");
+        // Older saved entries may have accidentally used the endpoint as
+        // the display name. Keep the address only in the connection field.
+        if (s.name != null && (s.name.trim().equalsIgnoreCase(s.host)
+                || isIpAddress(s.name.trim()))) {
+            s.name = "FemboyGram";
+        }
         s.description = obj.optString("description", "");
         s.rsaPublicKey = obj.optString("rsaPublicKey", "");
         s.logoPath = obj.optString("logoPath", "");
