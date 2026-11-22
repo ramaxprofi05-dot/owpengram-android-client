@@ -420,7 +420,7 @@ public class ServerInfoFragment extends BaseFragment {
             if (ctx == null || server == null) return null;
             int res = 0;
             if (TextUtils.isEmpty(server.logoPath)) {
-                if (org.telegram.owpengram.OwpengramServers.ID_OWPENGRAM.equals(server.id)) res = org.telegram.messenger.R.drawable.server_owpengram;
+                if (org.telegram.owpengram.OwpengramServers.ID_OWPENGRAM.equals(server.id)) res = org.telegram.messenger.R.drawable.server_femboygram;
                 else if (org.telegram.owpengram.OwpengramServers.ID_TELEGRAM.equals(server.id)) res = org.telegram.messenger.R.drawable.server_telegram;
                 if (res == 0) return null;
             }
