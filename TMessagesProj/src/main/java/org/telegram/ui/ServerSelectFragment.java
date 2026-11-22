@@ -46,7 +46,7 @@ import java.util.concurrent.Executors;
 
 /**
  * Server selection (mirrors the desktop client's Intro server-select step):
- *   - list of servers as cards (logo, name, endpoint, live online status, Join button)
+ *   - list of servers as cards (brand, name, live online status, Join button)
  *   - tap a row to open its details, tap Join to connect
  *   - Join performs an online check, then shows a blocking "Connecting" dialog,
  *     applies the server, waits for the MTProto connection, and only then proceeds
@@ -283,7 +283,7 @@ public class ServerSelectFragment extends BaseFragment {
                 } else {
                     AlertDialog.Builder b = new AlertDialog.Builder(getParentActivity());
                     b.setTitle("Server unreachable");
-                    b.setMessage("Couldn't reach " + server.name + " (" + server.host + ":" + server.port + "). Try to connect anyway?");
+                    b.setMessage("Couldn't reach " + server.name + ". Try to connect anyway?");
                     b.setPositiveButton("Connect", (d, w) -> proceedJoin(server));
                     b.setNegativeButton("Cancel", null);
                     showDialog(b.create());
