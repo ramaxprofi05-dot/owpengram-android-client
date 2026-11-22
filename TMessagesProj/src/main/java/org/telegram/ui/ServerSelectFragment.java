@@ -505,7 +505,7 @@ public class ServerSelectFragment extends BaseFragment {
         if (ctx == null || server == null) return null;
         int res = 0;
         if (TextUtils.isEmpty(server.logoPath)) {
-            if (OwpengramServers.ID_OWPENGRAM.equals(server.id)) res = org.telegram.messenger.R.drawable.server_owpengram;
+            if (OwpengramServers.ID_OWPENGRAM.equals(server.id)) res = org.telegram.messenger.R.drawable.server_femboygram;
             else if (OwpengramServers.ID_TELEGRAM.equals(server.id)) res = org.telegram.messenger.R.drawable.server_telegram;
             if (res == 0) return null;
         }
