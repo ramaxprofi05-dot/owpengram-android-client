@@ -63,7 +63,7 @@ public class OwpengramServers {
     private static final String DEFAULT_HOST = "95.163.2.31";
     private static final int    DEFAULT_PORT = 2398;
 
-    // OwpenGram's own production server RSA key.
+    // FemboyGram's pinned production server RSA key.
     static final String OWPENGRAM_RSA_KEY =
         "-----BEGIN RSA PUBLIC KEY-----\n" +
         "MIIBCgKCAQEAxUi0fsjiop7kTI+c+ATHwIs+XPcircj9WL/tNASH45/phiIvxhPU\n" +
