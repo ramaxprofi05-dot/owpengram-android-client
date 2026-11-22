@@ -72,6 +72,13 @@ jobs:
           test -n "$BUILD_CONFIG"
           grep -F 'APP_EDITION = "femboy"' "$BUILD_CONFIG"
 
+      - name: Reject legacy branding in localized app strings
+        run: |
+          if grep -RniE 'ExteraGram|OwpenGram' TMessagesProj/src/main/res/values*/strings.xml; then
+            echo "Legacy client branding found in localized strings."
+            exit 1
+          fi
+
 
   build:
     needs: verify
