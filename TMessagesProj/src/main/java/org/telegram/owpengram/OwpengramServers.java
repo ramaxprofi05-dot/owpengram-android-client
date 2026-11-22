@@ -759,6 +759,11 @@ public class OwpengramServers {
             String description,
             String logoPath,
             boolean hasIcon) {
+        // The server endpoint is connection data, never its public display name.
+        if (!TextUtils.isEmpty(name)
+                && (name.trim().equalsIgnoreCase(server.host) || isIpAddress(name.trim()))) {
+            name = "FemboyGram";
+        }
         String supersededLogo = null;
         boolean changed = false;
 
@@ -844,6 +849,14 @@ public class OwpengramServers {
         if (!TextUtils.isEmpty(supersededLogo)) {
             deleteServerLogoFile(supersededLogo);
         }
+    }
+
+    private static boolean isIpAddress(String value) {
+        if (TextUtils.isEmpty(value)) return false;
+        if (value.indexOf(':') >= 0) {
+            return value.matches("[0-9a-fA-F:.%]+");
+        }
+        return value.matches("(?:[0-9]{1,3}\\.){3}[0-9]{1,3}");
     }
 
     /**
