@@ -1,98 +1,70 @@
 <p align="center">
-  <img src="media/readme/owpengram_splash.png" alt="OwpenGram" width="440">
+  <img src="media/readme/femboygram_logo.svg" alt="FemboyGram" width="220">
 </p>
 
-# 🤖 OwpenGram for Android
+# 💜 FemboyGram for Android
 
-**One familiar app. Any server you trust.**
+**One familiar messenger. Your own FemboyGram network.**
 
-OwpenGram for Android is a multi-server messenger built on a fast, familiar
-experience. Use the official network, your own private server, or any community
-node — each account independent, all in one app. Private by design, comfortable
-to use, and free from lock-in.
+FemboyGram for Android is a Telegram-compatible, multi-server messenger with
+its own visual identity and a self-hosted default server. Each account stays
+bound to its selected server, so identities and data remain separated.
 
-> 🤖 **Available now for Android** — grab the APK from the
-> [Releases](https://github.com/owpengram/owpengram-android-client/releases)
-> tab. The web client is live at [web.owpengram.org](https://web.owpengram.org);
-> iOS is planned.
+> **Android client source** — this repository contains the FemboyGram Android
+> client. APK releases will be published in the
+> [Releases](https://github.com/ramaxprofi05-dot/owpengram-android-client/releases)
+> tab after the branded build has passed verification.
 
-> 🔗 Built on **MTProto API layer 232**, on top of Telegram for Android `v13.1.1`.
+> Built on **MTProto API layer 232**, using the Telegram for Android
+> `v13.1.1` codebase as its protocol-compatible foundation.
 
 <p align="center">
-  <img src="media/readme/android_hero.png" alt="OwpenGram for Android — chats and calls" width="820">
+  <img src="media/readme/android_hero.png" alt="FemboyGram for Android — chats and calls" width="820">
 </p>
 
 ---
 
 ## 📥 Download
 
-The APK lives in the
-[Releases](https://github.com/owpengram/owpengram-android-client/releases) tab —
-download, allow install from your browser, open it. One universal APK covers
-all four ABIs (`armeabi-v7a`, `arm64-v8a`, `x86`, `x86_64`), and it runs on
-**Android 6.0+**.
-
-It is the *unrestricted* build, the direct-download flavour rather than the
-Play-Store one: no Google Play restrictions, no Firebase dependency, and push
-delivered by the client's own keep-alive connection instead of a cloud service.
-It shares its application id and signature with the Play build, so installing it
-over an existing OwpenGram is an in-place update — your chats stay where they
-are.
+The APK will be published in the
+[Releases](https://github.com/ramaxprofi05-dot/owpengram-android-client/releases)
+tab after the current FemboyGram source changes have been verified and built.
+The Android project targets **Android 6.0+**.
 
 ## 🔄 Updates
 
 The app checks the project's GitHub releases on start (and from **Settings**
 → check for updates). When a newer release is published it shows the usual
-update window with the release notes, and its button opens the APK for
-download — Android does not let an app replace itself silently, so the final
-install is yours. The check asks GitHub directly, so it works the same
-whichever server the active account lives on. Local builds with release number
-`0` never check.
+update window with the release notes and an install prompt.
 
-## 🚀 Try it without setting up anything
+## 🚀 Connect to FemboyGram
 
-We run a **public OwpenGram server**, and it is already built into this client —
-no address to type, no key to paste, no Docker. Install the APK, and on the
-server-selection screen at login tap **OwpenGram** instead of Telegram, then
-sign in as usual.
-
-That account sits alongside your Telegram one, so you can try the project
-without leaving anything behind. When you want your own server later, you add
-it in the same app and keep both.
+The FemboyGram server is preconfigured in the client. Choose **FemboyGram**
+on the server-selection screen to connect. You can also add another
+Telegram-compatible server using its `host:port` address; the client can
+retrieve its public server identity and icon automatically.
 
 ## ✨ Why you'll like it
 
-- 🌐 **Multi-server** — add accounts on different servers and switch between them freely.
-- 🏠 **Bring your own server** — connect to a server you host and fully control.
-- 🔎 **Adding one takes an address** — type `host:port`, the app fetches the server's key, DC and identity itself.
-- 🧠 **Familiar & comfortable** — the experience you already know, no learning curve.
-- 🔒 **Private** — talk on infrastructure you trust, away from the cloud.
-- 🛡️ **Censorship-resistant** — your own server stays reachable when others are blocked.
-- 🆓 **Open source** — read it, audit it, build it yourself.
+- 🌐 **Multi-server** — add accounts on different compatible servers.
+- 🏠 **Self-hosted** — connect to infrastructure you control.
+- 🔎 **Simple server setup** — add a `host:port` address and fetch public server details.
+- 💜 **FemboyGram identity** — branded app name, launcher icon, splash screen and onboarding.
+- 🔒 **Separated accounts** — each account remains bound to its selected server.
+- 🆓 **Open source** — inspect the source and build it yourself.
 
 ## 🌐 How multi-server works
 
 Every account is tied to a server, and you choose that server when you sign in.
-OwpenGram comes with ready-to-use options:
-
-- **Telegram** — the official network (use your normal Telegram account)
-- **OwpenGram** — our public server, live and ready to use, already in the list
-- **Custom** — any server you or your community runs
+The client comes with the FemboyGram server preconfigured and also supports
+custom Telegram-compatible servers.
 
 Add several accounts on different servers and they stay cleanly separated —
-different identities, different data, one app. Separation is real, not cosmetic:
-each account's cached peers, files and ids are scoped to the server they came
-from, so two servers that happen to hand out the same numeric id never bleed
-into each other. Official Telegram accounts still count against Telegram's own
-limit (3, or 5 with Premium); self-hosted ones aren't subject to that — the only
-ceiling is the app's own **50 accounts in total**, across every server combined.
+different identities, different data, one app. Each account's cached peers,
+files and ids are scoped to its server.
 
 Remove a server and every account on it goes with it — no orphaned logins left
 behind pointing at a host that no longer exists.
-
-<p align="center">
-  <img src="media/readme/android_multiserver.png" alt="Choose a server, and accounts grouped by server" width="620">
-</p>
 
 ## 🔌 Connect your own server
 
